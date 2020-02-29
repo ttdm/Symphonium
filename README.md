@@ -1,5 +1,4 @@
 # Synphonium v0.1 [alpha]
-===============
 
 A tool to help when learning to play the piano.
 
