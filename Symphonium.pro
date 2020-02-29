@@ -50,3 +50,15 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+#BEGIN Shitty STUFF TO FIND winmmlib; IT SHOULDNT BE RELEASED ONLINE IN THAT STATE.
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64/' -lWinMM
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64/' -lWinMM
+
+INCLUDEPATH += $$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64'
+DEPENDPATH += $$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64'
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64/libWinMM.a'
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64/libWinMM.a'
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64/WinMM.lib'
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64/WinMM.lib'
