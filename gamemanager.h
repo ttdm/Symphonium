@@ -38,11 +38,13 @@ public:
 
     //Game Live Parameters
     bool isMidiSelectedFileValid;
-    bool isPlaying;
+    bool isMIDIPlaying;
     int gameMode; //0 : list to song, 1 : pratice song ; 2 : play song
     int selectedTrack; // which track will be taken into account when checking inputs vs midifile
     int handsInplay; //0 : left hand, 1 : right hand, 2 both
     double RTFactor; //factor that is used to
+    double soundLevel;
+    bool restreamMIDIIn;
 
     //interval handling :
     bool isIntervalOn; //true if we play only a specific interval

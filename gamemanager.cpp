@@ -5,7 +5,7 @@
 
 GameManager::GameManager()
 {
-    isPlaying = false;
+    isMIDIPlaying = false;
     gameMode = 0;
     handsInplay = 2;
     RTFactor = 1.0;
@@ -16,6 +16,8 @@ GameManager::GameManager()
     isMIDIDeviceReady = false;
     midiInPort = -1;
     midiOutPort = -1;
+    soundLevel = 1.;
+    restreamMIDIIn = false;
 }
 
 GameManager::~GameManager()
@@ -172,16 +174,49 @@ void GameManager::selectMIDIFile(std::string path)
 
 void GameManager::update()
 {
-   // qDebug() << "in manager update";
-   if (!isPlaying) //don't update if not currently playing
-   {
+    // qDebug() << "in manager update";
+
+    //whatever the state, if possible, read MIDI IN, it does allow to listen to the what's played if MIDI IN is forfarwded.
+    if (isMIDIDeviceReady)
+    {
+        std::vector<unsigned char> oneInput;
+        midiin->getMessage(&oneInput);
+        while (oneInput.size() != 0)  //which means that we have a MIDI message to decrypt
+        {
+            if (restreamMIDIIn) midiout->sendMessage(&oneInput); //XXX to watch, maybe better to only stream 144 and 128 event types (note in note off).
+            if ( (int)oneInput.at(0) == 144 )
+            {
+                if ( (int)oneInput.at(2)>0)
+                {
+                    currPressedNotes.insert((int)oneInput.at(1));
+                }
+                else //weirdly, on my keyboard; when releasing a key, instead of a msg : 128 X X; i get a 144 key 0;
+                    //implementing both behavior, in case this varies between keyboards and/or OSs
+                {
+                    std::set<int>::iterator it;
+                    it = currPressedNotes.find((int)oneInput.at(1));
+                    currPressedNotes.erase(it);
+                }
+            }
+            if ( (int)oneInput.at(0) == 128 )
+            {
+                std::set<int>::iterator it;
+                it = currPressedNotes.find((int)oneInput.at(1));
+                currPressedNotes.erase(it);
+            }
+            midiin->getMessage(&oneInput);
+        }
+    }
+
+    if (!isMIDIPlaying)//Don't to anything else if no MIDIfile is currently played
+    {
         qtime.restart(); //but update the clock so that the first time step when playing will be correct.
         return;
-   }
-   int elapsed = qtime.restart();
+    }
+    int elapsed = qtime.restart();
 
-   if (gameMode==0) // listen
-   {
+    if (gameMode==0) // listen
+    {
        prevsongTime = songTime;
        songTime += elapsed/1000.*RTFactor;
        for (int i = 0; i <midifile.getTrackCount(); i ++)
@@ -194,7 +229,7 @@ void GameManager::update()
                     if (midifile[i][j].isNoteOn())
                     {
                         unsigned char currNote = midifile[i][j].getP1();
-                        unsigned char velNote = midifile[i][j].getP2();
+                        unsigned char velNote = std::min(int(midifile[i][j].getP2()*soundLevel),127);
                         std::vector<unsigned char> message(3);
                         // Note On: 144, note, vel
                         message[0] = 144;
@@ -223,37 +258,6 @@ void GameManager::update()
                     }
                 }
             }
-       }
-   }
-
-   //read MIDI IN
-   if (isMIDIDeviceReady)
-   {
-       std::vector<unsigned char> oneInput;
-       midiin->getMessage(&oneInput);
-       while (oneInput.size() != 0)  //which means that we have a MIDI message to decrypt
-       {
-           if ( (int)oneInput.at(0) == 144 )
-           {
-               if ( (int)oneInput.at(2)>0)
-               {
-                   currPressedNotes.insert((int)oneInput.at(1));
-               }
-               else //weirdly, on my keyboard; when releasing a key, instead of a msg : 128 X X; i get a 144 key 0;
-                   //implementing both behavior, in case this varies between keyboards and/or OSs
-               {
-                   std::set<int>::iterator it;
-                   it = currPressedNotes.find((int)oneInput.at(1));
-                   currPressedNotes.erase(it);
-               }
-           }
-           if ( (int)oneInput.at(0) == 128 )
-           {
-               std::set<int>::iterator it;
-               it = currPressedNotes.find((int)oneInput.at(1));
-               currPressedNotes.erase(it);
-           }
-           midiin->getMessage(&oneInput);
        }
    }
 

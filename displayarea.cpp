@@ -30,7 +30,6 @@ DisplayArea::DisplayArea(QWidget *parent) : QWidget(parent)
 
     songTime = -2; //in sec
     songTimeShowed = 5; //in sec
-    isPlaying = false;
     selectedTrack = 0;
 
     isIntervalOn = false;
@@ -284,7 +283,6 @@ void DisplayArea::paintEvent(QPaintEvent *event)
 void DisplayArea::getParamsFromManager(GameManager *manager){
     isMidiSelectedFileValid = manager->isMidiSelectedFileValid;
     songTime = manager->songTime;
-    isPlaying = manager->isPlaying;
     selectedTrack = manager->selectedTrack;
     isIntervalOn = manager->isIntervalOn;
     intInitTime = manager->intInitTime;
@@ -296,6 +294,6 @@ void DisplayArea::getParamsFromManager(GameManager *manager){
 
 void DisplayArea::animate()
 {
-   if (!isPlaying) update(); //QT created slot that call paintEvent.
+   update(); //QT created slot that call paintEvent.
 }
 

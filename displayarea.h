@@ -62,7 +62,6 @@ private:
     QColor keyboardNoteColor;
 
     double songTime;
-    bool isPlaying;
     int selectedTrack;
 
     //interval

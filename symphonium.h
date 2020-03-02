@@ -49,6 +49,8 @@ private slots:
     void selectTrackMode(int);
     void setRTFactor(int);
     void setDisplayDuration(double);
+    void setSoundLevel(int);
+    void restreamMIDIin(int);
 
     //override of closeEvent to save config.
     void closeEvent(QCloseEvent *event);

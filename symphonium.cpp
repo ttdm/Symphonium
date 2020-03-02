@@ -195,6 +195,23 @@ void Symphonium::setupToolbar()
     timeB4restarting->setFixedWidth(170);
     ui->toolBar->addWidget(timeB4restarting);
     connect(timeB4restarting, SIGNAL(valueChanged(double)), this, SLOT(changeTimeB4Restart(double)));
+
+    //audio handling
+    ui->toolBar->addSeparator();
+    QSpinBox *soundLevelSpin = new QSpinBox;
+    soundLevelSpin->setRange(0,500);
+    soundLevelSpin->setRange(0,500);
+    soundLevelSpin->setSingleStep(10);
+    soundLevelSpin->setPrefix(tr("Volume (see FAQ!): "));
+    soundLevelSpin->setSuffix(tr("%"));
+    soundLevelSpin->setValue(100);
+    soundLevelSpin->setFixedWidth(148);
+    ui->toolBar->addWidget(soundLevelSpin);
+    connect(soundLevelSpin, SIGNAL(valueChanged(int)), this, SLOT(setSoundLevel(int)));
+    QCheckBox *restreamMIDIIn = new QCheckBox;
+    restreamMIDIIn->setText("Forward MIDI Input to output");
+    connect(restreamMIDIIn, SIGNAL(stateChanged(int)), this, SLOT(restreamMIDIin(int)));
+    ui->toolBar->addWidget(restreamMIDIIn);
 }
 
 void Symphonium::setDisplayDuration(double duration)
@@ -206,6 +223,12 @@ void Symphonium::setRTFactor(int fact)
 {
     manager.RTFactor = (double)fact/100.0;
 }
+
+void Symphonium::setSoundLevel(int fact)
+{
+    manager.soundLevel = (double)fact/100.0;
+}
+
 
 void Symphonium::selectMode(int answerId)
 {
@@ -387,8 +410,8 @@ void Symphonium::on_actionPlay_Pause_triggered()
             return;
     }
 
-    //if yes, toggle the isplaying constant (play/pause behavior)
-    manager.isPlaying = !manager.isPlaying;
+    //if yes, toggle the isMIDIplaying constant (play/pause behavior)
+    manager.isMIDIPlaying = !manager.isMIDIPlaying;
 }
 
 void Symphonium::on_libraryTableWidget_itemSelectionChanged()
@@ -455,7 +478,7 @@ void Symphonium::on_actionStop_triggered()
     {
         manager.songTime = -manager.options.timeB4Restart/2.0;
     }
-    manager.isPlaying = false;
+    manager.isMIDIPlaying = false;
 }
 
 void Symphonium::on_actionSkip_Fwd_triggered()
@@ -619,6 +642,11 @@ void Symphonium::changeTimeB4Restart(double value)
 void Symphonium::useIntervalSwitch(int state)
 {
     manager.isIntervalOn = (state != 0);
+}
+
+void Symphonium::restreamMIDIin(int state)
+{
+    manager.restreamMIDIIn = (state != 0);
 }
 
 void Symphonium::intervalBeginTimeChanged(QTime t)
