@@ -523,43 +523,16 @@ void Symphonium::on_slider_valueChanged(int value)
         manager.songTime = (double)value/1000.0*manager.songDuration;
         if (value==0) manager.songTime = -manager.options.timeB4Restart/2.0;
     }
-
 }
 
 void Symphonium::on_actionselect_MIDI_device_triggered()
 {
-    //Check inputs.
-    unsigned int nInPorts = manager.midiin->getPortCount();
-    if (nInPorts == 0)
-    {
-        QMessageBox Msgbox;
-        Msgbox.setWindowTitle("No input MIDI port detected");
-        Msgbox.setTextFormat(Qt::RichText);
-          Msgbox.setText("<center>No input MIDI port detected. Please connect your MIDI device before retrying.<br><br>"
-                         "If you have this issue while having a MIDI device connected,<br>"
-                         "feel free to ask for help by opening a <a href=\"https://github.com/ttdm/symphonium/issue\">github issue</a>.</center>");
-            Msgbox.exec();
-            return;
-    }
-
-    unsigned int nOutPorts = manager.midiout->getPortCount();
-    if (nOutPorts == 0)
-    {
-        QMessageBox Msgbox;
-        Msgbox.setWindowTitle("No output MIDI port detected");
-        Msgbox.setTextFormat(Qt::RichText);
-          Msgbox.setText("<center>No output MIDI port detected. Please connect your MIDI device before retrying.<br><br>"
-                         "If you have this issue while having a MIDI device connected,<br>"
-                         "feel free to ask for help by opening a <a href=\"https://github.com/ttdm/symphonium/issue\">github issue</a>.</center>");
-            Msgbox.exec();
-            return;
-    }
-
     midiDialog = new QDialog();
     midiDialog->setWindowTitle("Select your MIDI in/out devices");
 
     midiinCombo = new QComboBox();
-    for ( unsigned int i=0; i<nInPorts; i++ ) {
+    unsigned int nInPorts = manager.midiin->getPortCount();
+    for ( unsigned int i=0; i<nInPorts+1; i++ ) { //+1 to allow empty input selec if only an output exist (which allow to listen to the songs))
           try {
           std::string portName = manager.midiin->getPortName(i);
             midiinCombo->addItem(QString::fromStdString(portName),Qt::DisplayRole);
@@ -568,8 +541,10 @@ void Symphonium::on_actionselect_MIDI_device_triggered()
             midiinCombo->addItem("",Qt::DisplayRole);
               }
     }
+
     midioutCombo = new QComboBox();
-    for ( unsigned int i=0; i<nOutPorts; i++ ) {
+    unsigned int nOutPorts = manager.midiout->getPortCount();
+    for ( unsigned int i=0; i<nOutPorts+1; i++ ) {
           try {
           std::string portName = manager.midiout->getPortName(i);
             midioutCombo->addItem(QString::fromStdString(portName),Qt::DisplayRole);
@@ -619,7 +594,8 @@ void Symphonium::finishMIDIdeviceSelection()
         QMessageBox Msgbox;
         Msgbox.setWindowTitle("Error while connecting to the selected devices");
         Msgbox.setTextFormat(Qt::RichText);
-          Msgbox.setText("<center>Error while connecting to the selected devices. Please try to connect other MIDI devices.<br><br>"
+          Msgbox.setText("<center>Error while connecting to the selected devices. Please try to connect other MIDI devices.<br>"
+                         "Please note that connecting ONLY to an output device will trigger this message but still allow to watch the MIDIFile and to listen to them.<br><br>"
                          "Feel free to ask for help by opening a <a href=\"https://github.com/ttdm/symphonium/issue\">github issue</a>.</center>");
             Msgbox.exec();
         return;

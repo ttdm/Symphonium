@@ -65,5 +65,10 @@ This soft has been inspired by Synthesia and PianoFromAbove but one is closed so
 After taking advices from better devs than myself, it would appear that it was faster
  to create this soft from scratch than to build on PFA which explain why I created nearly a copy of PFA.
 
+The following libraries are used in the soft : 
+- Qt
+- RTMIDI
+- MIDIFile
+
 I thank all the people that gave me some advices while I created Symphonium.
-Now that an alpha version is available, I'm quite open to contributions !
+Now that an alpha version is available, I'm totally open to contributions !

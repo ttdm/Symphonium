@@ -69,20 +69,22 @@ void GameManager::connectRTMIDIatStart()
 
 bool GameManager::connectRTMIDIobjects2ports(uint inId, uint outId)
 {
+    bool openFail = false;
     try {
         midiin->openPort(inId);
     }
     catch ( RtMidiError &error ) {
       error.printMessage();
-      return false;
+      openFail = true;
     }
     try {
         midiout->openPort(outId);
     }
     catch ( RtMidiError &error ) {
       error.printMessage();
-      return false;
+      openFail = true;
     }
+    if (openFail) return false; //don't update the config and display error msg
 
     // update config if needed
     if ( QString::compare(options.MIDIinPortName, QString::fromStdString(midiin->getPortName(inId)), Qt::CaseInsensitive) )
