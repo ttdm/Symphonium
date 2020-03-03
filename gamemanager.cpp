@@ -16,8 +16,12 @@ GameManager::GameManager()
     isMIDIDeviceReady = false;
     midiInPort = -1;
     midiOutPort = -1;
-    soundLevel = 1.;
+    userVolumeMultiplier = 1.;
     restreamMIDIIn = false;
+    for (int i = 0; i < 16; i++)
+    {
+        lastMIDIVolume[i] = 64;
+    }
 }
 
 GameManager::~GameManager()
@@ -153,8 +157,20 @@ void GameManager::selectMIDIFile(std::string path)
     {
         for (int j = 0; j <midifile[i].getEventCount() ; j++ )
         {
-            if (!midifile[i][j].isNoteOn() && !midifile[i][j].isNoteOff() )continue;
-            if (midifile.getTimeInSeconds(i,j) > totalTime)  totalTime = midifile.getTimeInSeconds(i,j);
+            if (!midifile[i][j].isNoteOn() && !midifile[i][j].isNoteOff() ) // XXX TODO dev stuff; usually just conitnue
+            {
+                if (midifile[i][j].getP0() == -1 ) {qDebug() << "midifile -1 error code" ;continue;}
+                if (midifile[i][j].getP0() == 255 ) continue;
+                if (midifile[i][j].getP0()>=176 && midifile[i][j].getP0() <= 191) // control change, 2 parameters
+                {
+                    //qDebug() << "ctrl change : "<< midifile[i][j].getP1() << " " << midifile[i][j].getP2();
+                    continue;
+                }
+                if (midifile[i][j].getP0() >= 192 && midifile[i][j].getP0() <= 207) { continue;}//qDebug() << "prog change : " << midifile[i][j].getP1();   continue;}
+                qDebug() << midifile[i][j].getP0();
+                continue;
+            }
+                if (midifile.getTimeInSeconds(i,j) > totalTime)  totalTime = midifile.getTimeInSeconds(i,j);
 
         }
         int lastIndex = midifile[i].getEventCount() -1;
@@ -164,48 +180,53 @@ void GameManager::selectMIDIFile(std::string path)
     songTime = - options.timeB4Restart/2.0;
     selectedTrack = 0;
 
+    //if we have a MIDI device, its controller should have been modified to correspond to the previously played music piece so we
+    if (isMIDIDeviceReady)
+    {
+        //reset MIDIdevice controller
+        std::vector<unsigned char> RSTmessage(1);
+        RSTmessage[0] = 255;
+        try {
+            midiout->sendMessage( &RSTmessage );
+        } catch (...) {
+            qDebug() << "error while sending reset message";
+        }
+
+        //set the volume back to Default * user defined volume choice.
+        std::vector<unsigned char> message(3);
+        message[1] = 7;
+        message[2] = std::min(int(64*userVolumeMultiplier), 127); //64 = default volume (according to MIDI documentation)
+        for (unsigned char i = 176; i <= 191; i++)
+        try {
+            message[0] = i;
+            midiout->sendMessage( &message );
+        } catch (...) {
+            qDebug() << "error while sending volume message to channel "  << i;
+        }
+    }
+
     //reset game variables
     delayTime = 0;
     successNoteCount=0;
     errorNoteCount=0;
     missedNoteCount=0;
     currPressedNotes.clear();
+    for (int i = 0; i < 16; i++)
+    {
+        lastMIDIVolume[i] = 64; //default volume
+    }
 }
 
 void GameManager::update()
 {
     // qDebug() << "in manager update";
 
-    //whatever the state, if possible, read MIDI IN, it does allow to listen to the what's played if MIDI IN is forfarwded.
+    // Whatever the state, if possible, read MIDI IN.
+    // it update currPressedNotes which allow to display the pressed keys
+    // and it allow to listen to MIDI in if forwarded to MIDI out
     if (isMIDIDeviceReady)
     {
-        std::vector<unsigned char> oneInput;
-        midiin->getMessage(&oneInput);
-        while (oneInput.size() != 0)  //which means that we have a MIDI message to decrypt
-        {
-            if (restreamMIDIIn) midiout->sendMessage(&oneInput); //XXX to watch, maybe better to only stream 144 and 128 event types (note in note off).
-            if ( (int)oneInput.at(0) == 144 )
-            {
-                if ( (int)oneInput.at(2)>0)
-                {
-                    currPressedNotes.insert((int)oneInput.at(1));
-                }
-                else //weirdly, on my keyboard; when releasing a key, instead of a msg : 128 X X; i get a 144 key 0;
-                    //implementing both behavior, in case this varies between keyboards and/or OSs
-                {
-                    std::set<int>::iterator it;
-                    it = currPressedNotes.find((int)oneInput.at(1));
-                    currPressedNotes.erase(it);
-                }
-            }
-            if ( (int)oneInput.at(0) == 128 )
-            {
-                std::set<int>::iterator it;
-                it = currPressedNotes.find((int)oneInput.at(1));
-                currPressedNotes.erase(it);
-            }
-            midiin->getMessage(&oneInput);
-        }
+        readMIDIin();
     }
 
     if (!isMIDIPlaying)//Don't to anything else if no MIDIfile is currently played
@@ -226,30 +247,54 @@ void GameManager::update()
             {
                 if (midifile[i][j].seconds > prevsongTime && midifile[i][j].seconds <= songTime )
                 {
-                    if (midifile[i][j].isNoteOn())
+                    if(midifile[i][j].getP0()==255)continue; // reset MIDI controllers messages should be ignored!
+                                                             // we already reset the controllers once at each MIDI file selection
+                    if(midifile[i][j].getP0()==-1)continue; //empty msg
+                    if(midifile[i][j].getP1()==-1)// no arguement midi message
                     {
-                        unsigned char currNote = midifile[i][j].getP1();
-                        unsigned char velNote = std::min(int(midifile[i][j].getP2()*soundLevel),127);
-                        std::vector<unsigned char> message(3);
-                        // Note On: 144, note, vel
-                        message[0] = 144;
-                        message[1] = currNote;
-                        message[2] = velNote;
+                        std::vector<unsigned char> message(1);
+                        message[0] = midifile[i][j].getP0();
                         try {
                             midiout->sendMessage( &message );
                         } catch (...) {
                             qDebug() << "error while sending 1 MIDI msg";
                         }
                     }
-                    if (midifile[i][j].isNoteOff())
+                    else if (midifile[i][j].getP2()==-1)// 1 arguement midi message
                     {
-                        unsigned char currNote = midifile[i][j].getP1();
-                        unsigned char smthNote = midifile[i][j].getP2();
+                        std::vector<unsigned char> message(2);
+                        message[0] = midifile[i][j].getP0();
+                        message[1] = midifile[i][j].getP1();
+                        try {
+                            midiout->sendMessage( &message );
+                        } catch (...) {
+                            qDebug() << "error while sending 1 MIDI msg";
+                        }
+                    }
+                    else if (midifile[i][j].getP3()==-1)// 2 arguement midi message
+                    {
                         std::vector<unsigned char> message(3);
-                        // Note Off: 128, note, ??vel??
-                        message[0] = 128;
-                        message[1] = 64;
-                        message[2] = 40;
+                        message[0] = midifile[i][j].getP0();
+                        message[1] = midifile[i][j].getP1();
+                        message[2] = midifile[i][j].getP2();
+                        try {
+                            midiout->sendMessage( &message );
+                        } catch (...) {
+                            qDebug() << "error while sending 1 MIDI msg";
+                        }
+                        //update midi volume if needed
+                        if (midifile[i][j].getP0() >= 176 && midifile[i][j].getP0() <= 191 && midifile[i][j].getP1() == 7 )
+                        {
+                            lastMIDIVolume[i-176] = midifile[i][j].getP2();
+                        }
+                    }
+                    else
+                    {
+                        std::vector<unsigned char> message(4);
+                        message[0] = midifile[i][j].getP0();
+                        message[1] = midifile[i][j].getP1();
+                        message[2] = midifile[i][j].getP2();
+                        message[3] = midifile[i][j].getP3();
                         try {
                             midiout->sendMessage( &message );
                         } catch (...) {
@@ -310,7 +355,7 @@ void GameManager::update()
             {
                 if ( selectedTrack == 0 | selectedTrack - 1 == i) //for the active track(s)
                 {
-                    //simply check that newly pressed notes should have been pressed at songTime +- DeltaT;
+                    //TODO compute sucess indicators
                 }
             }
        }
@@ -349,8 +394,8 @@ void GameManager::update()
                             std::vector<unsigned char> message(3);
                             // Note Off: 128, note, ??vel??
                             message[0] = 128;
-                            message[1] = 64;
-                            message[2] = 40;
+                            message[1] = currNote;
+                            message[2] = smthNote;
                             try {
                                 midiout->sendMessage( &message );
                             } catch (...) {
@@ -385,4 +430,52 @@ void GameManager::update()
    if (isIntervalOn && songTime > intFinalTime ) return; //don't play any note in that case
    if (isIntervalOn && songTime < intInitTime - options.timeB4Restart/2.0) songTime = intInitTime - options.timeB4Restart/2.0;
    if (isIntervalOn && songTime < intInitTime ) return; //don't play any note in that case
+}
+
+
+void GameManager::setVolume()
+{
+    if (isMIDIDeviceReady)
+    {
+        std::vector<unsigned char> message(3);
+        message[1] = 7; //indicates that the contorl paramater changed is the volume.
+        for (int i = 0; i <= 15; i++)
+        try {
+            message[0] = 176+i; //change a control parameter in the corresponding channel
+            message[2] = std::min(int(lastMIDIVolume[i]*userVolumeMultiplier),127); //set volume.
+            midiout->sendMessage( &message );
+        } catch (...) {
+            qDebug() << "error while sending volume message to channel "  << i;
+        }
+    }
+}
+
+void GameManager::readMIDIin(){
+    std::vector<unsigned char> oneInput;
+    midiin->getMessage(&oneInput);
+    while (oneInput.size() != 0)  //which means that we have a MIDI message to decrypt
+    {
+        if (restreamMIDIIn) midiout->sendMessage(&oneInput); //XXX to watch, maybe better to only stream 144 and 128 event types (note in note off).
+        if ( (int)oneInput.at(0) == 144 )
+        {
+            if ( (int)oneInput.at(2)>0)
+            {
+                currPressedNotes.insert((int)oneInput.at(1));
+            }
+            else //weirdly, on my keyboard; when releasing a key, instead of a msg : 128 X X; i get a 144 key 0;
+                //implementing both behavior, in case this varies between keyboards and/or OSs
+            {
+                std::set<int>::iterator it;
+                it = currPressedNotes.find((int)oneInput.at(1));
+                currPressedNotes.erase(it);
+            }
+        }
+        if ( (int)oneInput.at(0) == 128 )
+        {
+            std::set<int>::iterator it;
+            it = currPressedNotes.find((int)oneInput.at(1));
+            currPressedNotes.erase(it);
+        }
+        midiin->getMessage(&oneInput);
+    }
 }

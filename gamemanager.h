@@ -23,6 +23,8 @@ public:
     void connectRTMIDIatStart();
     bool createRTMIDIobjects();
     bool connectRTMIDIobjects2ports(uint inId, uint outId);
+    void setVolume();
+    void readMIDIin();
 
     smf::MidiFile midifile;// the midifile that's currently being displayed (and proably played!)
     //RT MIDI
@@ -43,7 +45,8 @@ public:
     int selectedTrack; // which track will be taken into account when checking inputs vs midifile
     int handsInplay; //0 : left hand, 1 : right hand, 2 both
     double RTFactor; //factor that is used to
-    double soundLevel;
+    double userVolumeMultiplier;
+    unsigned char lastMIDIVolume[16];
     bool restreamMIDIIn;
 
     //interval handling :

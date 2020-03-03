@@ -202,10 +202,10 @@ void Symphonium::setupToolbar()
     soundLevelSpin->setRange(0,500);
     soundLevelSpin->setRange(0,500);
     soundLevelSpin->setSingleStep(10);
-    soundLevelSpin->setPrefix(tr("Volume (see FAQ!): "));
+    soundLevelSpin->setPrefix(tr("Volume : "));
     soundLevelSpin->setSuffix(tr("%"));
     soundLevelSpin->setValue(100);
-    soundLevelSpin->setFixedWidth(148);
+    soundLevelSpin->setFixedWidth(95);
     ui->toolBar->addWidget(soundLevelSpin);
     connect(soundLevelSpin, SIGNAL(valueChanged(int)), this, SLOT(setSoundLevel(int)));
     QCheckBox *restreamMIDIIn = new QCheckBox;
@@ -224,9 +224,10 @@ void Symphonium::setRTFactor(int fact)
     manager.RTFactor = (double)fact/100.0;
 }
 
-void Symphonium::setSoundLevel(int fact)
+void Symphonium::setSoundLevel(int fact) //TODO important; change IT;
 {
-    manager.soundLevel = (double)fact/100.0;
+    manager.userVolumeMultiplier = (double)fact/100.0;
+    manager.setVolume();
 }
 
 
