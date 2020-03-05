@@ -132,6 +132,7 @@ bool GameManager::createRTMIDIobjects()
 void GameManager::selectMIDIFile(std::string path)
 {
     //read selected MIDI file and deal with error
+    //error should never happen since all files in library have already been opened by midifile but you never know.
     midifile.read(path);
     if ( !midifile.status() )
     {
@@ -144,41 +145,20 @@ void GameManager::selectMIDIFile(std::string path)
     //change the selected file to VALID since it is read by the midifile reader :
     isMidiSelectedFileValid = true;
 
-    //sorting all the MIDI tracks (no real interest!, maybe needed for doTimeAnalysis and linkNotePair?)
-    for (int i = 0; i < midifile.getTrackCount(); i ++)
-    {
-        midifile.sortTrack(i);
-    }
-    midifile.doTimeAnalysis();
-    midifile.linkNotePairs();
+    midifile.doTimeAnalysis(); //get time in second for all events
+    midifile.linkNotePairs(); //get note durations
 
     double totalTime = 0.0;
     for (int i = 0; i < midifile.getTrackCount() ; i++ )
     {
         for (int j = 0; j <midifile[i].getEventCount() ; j++ )
         {
-            if (!midifile[i][j].isNoteOn() && !midifile[i][j].isNoteOff() ) // XXX TODO dev stuff; usually just conitnue
-            {
-                if (midifile[i][j].getP0() == -1 ) {qDebug() << "midifile -1 error code" ;continue;}
-                if (midifile[i][j].getP0() == 255 ) continue;
-                if (midifile[i][j].getP0()>=176 && midifile[i][j].getP0() <= 191) // control change, 2 parameters
-                {
-                    //qDebug() << "ctrl change : "<< midifile[i][j].getP1() << " " << midifile[i][j].getP2();
-                    continue;
-                }
-                if (midifile[i][j].getP0() >= 192 && midifile[i][j].getP0() <= 207) { continue;}//qDebug() << "prog change : " << midifile[i][j].getP1();   continue;}
-                qDebug() << midifile[i][j].getP0();
-                continue;
-            }
+            if (!midifile[i][j].isNoteOn() && !midifile[i][j].isNoteOff() )  continue;
                 if (midifile.getTimeInSeconds(i,j) > totalTime)  totalTime = midifile.getTimeInSeconds(i,j);
-
         }
-        int lastIndex = midifile[i].getEventCount() -1;
     }
     songDuration = totalTime; //note : this is way longer than just checking for the last event of each track;
     // but quite often this last event is irrelevant and the midi file is way longer than the last note
-    songTime = - options.timeB4Restart/2.0;
-    selectedTrack = 0;
 
     //if we have a MIDI device, its controller should have been modified to correspond to the previously played music piece so we
     if (isMIDIDeviceReady)
@@ -211,6 +191,8 @@ void GameManager::selectMIDIFile(std::string path)
     errorNoteCount=0;
     missedNoteCount=0;
     currPressedNotes.clear();
+    songTime = - options.timeB4Restart/2.0;
+    selectedTrack = 0;
     for (int i = 0; i < 16; i++)
     {
         lastMIDIVolume[i] = 64; //default volume

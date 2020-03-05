@@ -81,7 +81,7 @@ private:
 
     void displayMIDILibrary();
     bool addDirectoryToLib(QDir directory);
-    void addOneFileTolib(QString filename);
+    bool addFileTolib(QString filePath);
     void setupToolbar();
 };
 

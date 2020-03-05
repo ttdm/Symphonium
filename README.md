@@ -52,8 +52,8 @@ change in complex classical MIDI pieces.
 
 Minor / For later :
 - resetSettings and resetLibrary options
-- improve the library : MIDI file durations, note number, difficulty estimation (note/sec?),
-accept only files that can be read by MIDIFile and not on their name wich is awfull!
+- improve the library : MIDI file durations, note number, difficulty estimation (note/sec?)
+- add in game points ?
 - make it usable with any piano by analyzing the input sounds and not the MIDI inputs.
 
 	-----------------------------------------------

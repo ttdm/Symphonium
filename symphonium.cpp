@@ -1,5 +1,6 @@
 #include "symphonium.h"
 #include "ui_symphonium.h"
+#include "MIDIFile/include/MidiFile.h"
 
 #include <QDesktopWidget>
 #include <QMessageBox>
@@ -230,7 +231,6 @@ void Symphonium::setSoundLevel(int fact) //TODO important; change IT;
     manager.setVolume();
 }
 
-
 void Symphonium::selectMode(int answerId)
 {
     if (answerId != 0 && !manager.isMIDIDeviceReady) // don't change the gamemode if there isnt any MIDI device
@@ -259,24 +259,22 @@ void Symphonium::on_actionAdd_File_To_Lib_triggered()
     // If we have a file name that is a midi file, add it to the list.
     if (!fileName.isEmpty())
     {
-        if (!fileName.right(3).compare(tr("mid"))) //this test SHOULD be improve; it SHOULD be any file properly read by "midifile"
-        {
-            addOneFileTolib(fileName);
-            manager.options.fileLibrary.push_back(fileName);
-            manager.options.isConfigModified = true;
-        }
-        else
+        if (!addFileTolib(fileName))
         {
             QMessageBox Msgbox;
-              Msgbox.setText("Selected File is not a midi file : "+fileName);
-                Msgbox.exec();
-        }
-    }
-        else {
-        QMessageBox Msgbox;
-          Msgbox.setText("Empty Filename");
+            Msgbox.setText("The selected file is not a valid MIDI file.");
             Msgbox.exec();
+            return;
         }
+        manager.options.fileLibrary.push_back(fileName);
+        manager.options.isConfigModified = true;
+    }
+    else
+    {
+        QMessageBox Msgbox;
+        Msgbox.setText("Empty Filename");
+        Msgbox.exec();
+    }
 }
 
 // add a folder to the MIDI library through UI
@@ -299,25 +297,30 @@ bool Symphonium::addDirectoryToLib(QDir directory)
     foreach(QString filename, fileList) {
         if (!filename.isEmpty())
         {
-            if (!filename.right(3).compare(tr("mid")))
-            {
-                addOneFileTolib(directory.filePath(filename));
-                addedFile ++;
-            }
+            bool fileAdded = addFileTolib(directory.filePath(filename));
+            if (fileAdded) addedFile ++;
         }
     }
     if (addedFile == 0)
     {
         QMessageBox Msgbox;
-          Msgbox.setText("No midi file (.mid) found in the directory.");
+          Msgbox.setText("No valid MIDI file found in the directory.");
             Msgbox.exec();
             return false;
     }
     return true;
 }
 
-void Symphonium::addOneFileTolib(QString filePath)
+bool Symphonium::addFileTolib(QString filePath)
 {
+    //check if MIDIFile can read the file. If yes continue; if not cancel.
+    smf::MidiFile file;
+    file.read(filePath.toStdString());
+    if ( !file.status() )
+    {
+            return false;
+    }
+
     //get the name of the file
     QString name = QFileInfo(filePath).fileName();
     name = name.left(name.length()-4);
@@ -334,10 +337,9 @@ void Symphonium::addOneFileTolib(QString filePath)
 
     ui->libraryTableWidget->setRowCount(rowCount+1);
 
-    //improvement1: add file only if readable with midifile
     //improvement2: parse the MIDI file to find its length and other infos
             //midifile.getFileDurationInSeconds(); midifile.getEventCount() (then filter event with notepressOn)
-    return;
+    return true;
 }
 
 void Symphonium::displayMIDILibrary()
@@ -367,7 +369,7 @@ void Symphonium::displayMIDILibrary()
     if (manager.options.fileLibrary.size() != 0)
     {
         foreach (QString fileName, manager.options.fileLibrary) {
-           addOneFileTolib(fileName);
+           addFileTolib(fileName);
         }
     }
 }
