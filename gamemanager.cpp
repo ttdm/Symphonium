@@ -229,9 +229,9 @@ void GameManager::update()
             {
                 if (midifile[i][j].seconds > prevsongTime && midifile[i][j].seconds <= songTime )
                 {
-                    if(midifile[i][j].getP0()==255)continue; // reset MIDI controllers messages should be ignored!
+                    if(midifile[i][j].getP0()==255) continue; // reset MIDI controllers messages should be ignored!
                                                              // we already reset the controllers once at each MIDI file selection
-                    if(midifile[i][j].getP0()==-1)continue; //empty msg
+                    if(midifile[i][j].getP0()==-1) continue; //empty msg
                     if(midifile[i][j].getP1()==-1)// no arguement midi message
                     {
                         std::vector<unsigned char> message(1);
@@ -259,15 +259,16 @@ void GameManager::update()
                         message[0] = midifile[i][j].getP0();
                         message[1] = midifile[i][j].getP1();
                         message[2] = midifile[i][j].getP2();
+                        //if the message is about the volume; modify it using the user specified parameter
+                        if (midifile[i][j].getP0() >= 176 && midifile[i][j].getP0() <= 191 && midifile[i][j].getP1() == 7 )
+                        {
+                            lastMIDIVolume[i] = midifile[i][j].getP2();
+                            message[2] = std::min(int(lastMIDIVolume[i]*userVolumeMultiplier),127); //127 is max acc to doc.
+                        }
                         try {
                             midiout->sendMessage( &message );
                         } catch (...) {
                             qDebug() << "error while sending 1 MIDI msg";
-                        }
-                        //update midi volume if needed
-                        if (midifile[i][j].getP0() >= 176 && midifile[i][j].getP0() <= 191 && midifile[i][j].getP1() == 7 )
-                        {
-                            lastMIDIVolume[i-176] = midifile[i][j].getP2();
                         }
                     }
                     else
@@ -424,7 +425,7 @@ void GameManager::setVolume()
         for (int i = 0; i <= 15; i++)
         try {
             message[0] = 176+i; //change a control parameter in the corresponding channel
-            message[2] = std::min(int(lastMIDIVolume[i]*userVolumeMultiplier),127); //set volume.
+            message[2] = std::min(int(lastMIDIVolume[i]*userVolumeMultiplier),127); //set volume; 127 is max acc to doc.
             midiout->sendMessage( &message );
         } catch (...) {
             qDebug() << "error while sending volume message to channel "  << i;

@@ -8,8 +8,7 @@ CONFIG += c++11
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
-DEFINES += QT_DEPRECATED_WARNINGS __WINDOWS_MM__ #TODO choose your MIDI intput/output library
-#TODO LIBS and INCLUDEPATH must be edited to link your chosen MIDI intput/output library
+DEFINES += QT_DEPRECATED_WARNINGS
 
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -17,6 +16,11 @@ DEFINES += QT_DEPRECATED_WARNINGS __WINDOWS_MM__ #TODO choose your MIDI intput/o
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 RC_ICONS = symphonium.ico
+
+DEFINES += __WINDOWS_MM__ #TODO choose your MIDI intput/output library
+#TODO LIBS and INCLUDEPATH must be edited to link your chosen MIDI intput/output library
+win32: LIBS += -L$$PWD/'../winMM' -lWinMM-x64
+win32: PRE_TARGETDEPS += $$PWD/'../winMM/WinMM-x64.lib'
 
 SOURCES += \
     MIDIFile/src/Binasc.cpp \
@@ -50,15 +54,3 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-#BEGIN Shitty STUFF TO FIND winmmlib; IT SHOULDNT BE RELEASED ONLINE IN THAT STATE.
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64/' -lWinMM
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64/' -lWinMM
-
-INCLUDEPATH += $$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64'
-DEPENDPATH += $$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64'
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64/libWinMM.a'
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64/libWinMM.a'
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64/WinMM.lib'
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/'../../../../../../../Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64/WinMM.lib'

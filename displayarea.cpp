@@ -14,12 +14,6 @@ DisplayArea::DisplayArea(QWidget *parent) : QWidget(parent)
     gradient.setColorAt(1.0, QColor(0xa6, 0xce, 0x39));
 
     background = QBrush(QColor(40, 40, 40));
-
-    circleBrush = QBrush(gradient);
-    circlePen = QPen(Qt::black);
-    circlePen.setWidth(1);
-    textPen = QPen(Qt::white);    
-    textFont.setPixelSize(50);
     midiNoteColor = QColor(0x31, 0x8C, 0xE7);
     keyboardNoteColor = QColor(0x79, 0x1C, 0xF8);
 

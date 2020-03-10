@@ -44,10 +44,6 @@ private:
     bool isMidiSelectedFileValid;
 
     QBrush background;
-    QBrush circleBrush;
-    QFont textFont;
-    QPen circlePen;
-    QPen textPen;
     int elapsed;
 
     //display parameters :
