@@ -65,7 +65,7 @@ void GameManager::connectRTMIDIatStart()
     }
 
     //exit if no correspoding port has been found :
-    if (inId == -1 | outId == -1) return;
+    if (inId == -1 || outId == -1) return;
 
     //connect the RTmidi objects to the channel stored in the options; exit if there is a problem
     if (!connectRTMIDIobjects2ports(inId,outId)) return;
@@ -301,7 +301,7 @@ void GameManager::update()
         {
              for (int j = 0; j < midifile[i].getEventCount(); j++ )
              {
-                 if ( selectedTrack == 0 | selectedTrack - 1 == i) //for the active track(s)
+                 if ( selectedTrack == 0 || selectedTrack - 1 == i) //for the active track(s)
                  {
                      if (midifile[i][j].seconds > songTime && midifile[i][j].seconds <= expectedSongTime ) //at good time
                      {
@@ -336,7 +336,7 @@ void GameManager::update()
        {
             for (int j = 0; j < midifile[i].getEventCount(); j++ )
             {
-                if ( selectedTrack == 0 | selectedTrack - 1 == i) //for the active track(s)
+                if ( selectedTrack == 0 || selectedTrack - 1 == i) //for the active track(s)
                 {
                     //TODO compute sucess indicators
                 }
@@ -345,7 +345,7 @@ void GameManager::update()
    }
 
    //play notes of other tracks in GameMode 1 and 2
-   if ( gameMode == 1 | gameMode == 2)
+   if ( gameMode == 1 || gameMode == 2)
    {
         for (int i = 0; i <midifile.getTrackCount(); i ++)
         {

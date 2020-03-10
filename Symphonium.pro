@@ -19,16 +19,18 @@ RC_ICONS = symphonium.ico
 
 DEFINES += __WINDOWS_MM__ #TODO choose your MIDI intput/output library
 #TODO LIBS and INCLUDEPATH must be edited to link your chosen MIDI intput/output library
-win32: LIBS += -L$$PWD/'../winMM' -lWinMM-x64
-win32: PRE_TARGETDEPS += $$PWD/'../winMM/WinMM-x64.lib'
+win32: LIBS += -L$$PWD/'libs/winMM' -lWinMM-x64
+win32: PRE_TARGETDEPS += $$PWD/'libs/winMM/WinMM-x64.lib'
+
+INCLUDEPATH += libs/
 
 SOURCES += \
-    MIDIFile/src/Binasc.cpp \
-    MIDIFile/src/MidiEvent.cpp \
-    MIDIFile/src/MidiEventList.cpp \
-    MIDIFile/src/MidiFile.cpp \
-    MIDIFile/src/MidiMessage.cpp \
-    RTMIDI/RtMidi.cpp \
+    libs/MIDIFile/src/Binasc.cpp \
+    libs/MIDIFile/src/MidiEvent.cpp \
+    libs/MIDIFile/src/MidiEventList.cpp \
+    libs/MIDIFile/src/MidiFile.cpp \
+    libs/MIDIFile/src/MidiMessage.cpp \
+    libs/RTMIDI/RtMidi.cpp \
     displayarea.cpp \
     gamemanager.cpp \
     gameoptions.cpp \
@@ -36,12 +38,12 @@ SOURCES += \
     symphonium.cpp
 
 HEADERS += \
-    MIDIFile/include/Binasc.h \
-    MIDIFile/include/MidiEvent.h \
-    MIDIFile/include/MidiEventList.h \
-    MIDIFile/include/MidiFile.h \
-    MIDIFile/include/MidiMessage.h \
-    RTMIDI/RtMidi.h \
+    libs/MIDIFile/include/Binasc.h \
+    libs/MIDIFile/include/MidiEvent.h \
+    libs/MIDIFile/include/MidiEventList.h \
+    libs/MIDIFile/include/MidiFile.h \
+    libs/MIDIFile/include/MidiMessage.h \
+    libs/RTMIDI/RtMidi.h \
     displayarea.h \
     gamemanager.h \
     gameoptions.h \
