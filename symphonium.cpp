@@ -269,18 +269,14 @@ void Symphonium::on_actionAdd_File_To_Lib_triggered()
         manager.options.fileLibrary.push_back(fileName);
         manager.options.isConfigModified = true;
     }
-    else
-    {
-        QMessageBox Msgbox;
-        Msgbox.setText("Empty Filename");
-        Msgbox.exec();
-    }
 }
 
 // add a folder to the MIDI library through UI
 void Symphonium::on_actionAdd_Folder_To_Lib_triggered()
 {
+    //TODO small improvement; this dialog should show file but allow only directory selection; not trivial according to online Q&As
     QDir directory = QFileDialog::getExistingDirectory(this, tr("Select directory"));
+    if (directory.path() == ".") return;
     bool fileAdded = addDirectoryToLib(directory);
     if (fileAdded)
     {
@@ -294,7 +290,8 @@ bool Symphonium::addDirectoryToLib(QDir directory)
 {
     QStringList fileList = directory.entryList();
     int addedFile = 0;
-    foreach(QString filename, fileList) {
+    foreach(QString filename, fileList)
+    {
         if (!filename.isEmpty())
         {
             bool fileAdded = addFileTolib(directory.filePath(filename));
