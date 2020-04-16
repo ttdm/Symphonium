@@ -14,7 +14,7 @@ install:
 script:
 
   - sed -i -e 's|__WINDOWS_MM__|__LINUX_ALSA__|g' Symphonium.pro
-  - sed -i -e 's|win32: LIBS += -L$$PWD/'"'"'libs/winMM'"'"' -lWinMM-x64|unix: LIBS += -lm -lasound -pthread|g' Symphonium.pro
+  - sed -i -e 's|win32 |unix: LIBS += -lm -lasound -pthread #|g' Symphonium.pro
   - cat Symphonium.pro
   - qmake CONFIG+=release PREFIX=/usr
   - make -j$(nproc)
