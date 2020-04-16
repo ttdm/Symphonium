@@ -13,7 +13,8 @@ install:
 
 script:
 
-  - sed -i -e 's|__WINDOWS_MM__|__LINUX_ALSA__|g'
+  - sed -i -e 's|__WINDOWS_MM__|__LINUX_ALSA__|g' Symphonium.pro
+  - sed -i -e 's|-L$$PWD/\'libs/winMM\' -lWinMM-x64|-lm -lasound -pthread|g' Symphonium.pro
   - qmake CONFIG+=release PREFIX=/usr
   - make -j$(nproc)
   - make INSTALL_ROOT=appdir -j$(nproc) install ; find appdir/
