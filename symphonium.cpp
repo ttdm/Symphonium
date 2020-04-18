@@ -78,6 +78,8 @@ Symphonium::Symphonium(QWidget *parent)
     songDurationLabel->setFixedWidth(80);
     songDurationLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     songDurationLabel->show();
+
+    ui->menubar->raise(); //probably hide a little error; if not some buttons are not selectable (caused by the library)
 }
 
 //update manager and display periodically
@@ -527,15 +529,15 @@ void Symphonium::on_actionAbout_triggered()
     Msgbox.setWindowTitle("About Symphonium");
     Msgbox.setTextFormat(Qt::RichText);
     Msgbox.setText("<center> Symphonium is an open source and cross-platform project designed to help learning to play the piano.<br>"
-                   "More information on it can be found on its <a href=\"https://github.com/ttdm/symphonium\">github repository</a>.<br>"
-                   "The sources can be found at <a href=\"https://github.com/ttdm/\">sources</a>. Any help to improve the software is welcome !"
+                   "More information on it can be found on its <a href=\"https://symphonium.net/">website</a>.<br>"
+                   "Its sources can be found on its <a href=\"https://github.com/ttdm/symphonium/\">github repository</a>. Any help to improve the software is welcome !<br>"
                    "Initially developped by <a href=\"https://ttdm.github.io/\">TTDM</a>.</center>");
-    Msgbox.exec(); //TODO change this message when the symphosium website will be created.
+    Msgbox.exec();
 }
 
 void Symphonium::on_actionOnline_FAQ_triggered()
 {
-    QString FAQLink = "http://www.github.comttdm/symphonium/issues"; //TODO change this message when the symphosium website will be created
+    QString FAQLink = "https://symphonium.net/faq/";
     QDesktopServices::openUrl(QUrl(FAQLink));
 }
 

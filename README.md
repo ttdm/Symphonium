@@ -1,9 +1,8 @@
 # Synphonium v0.1 [alpha]
 
 A tool to help when learning to play the piano.
-
-At the moment, available only for tech users since it needs to be compiled from source.
-Hopefully, non tech users should be able to use it in a week or so, a website will be dedicated to non technical users.
+Non technical user should go the [website](https://symphonium.net/). A windows executable is available.
+I'm currently working on creating a package for Arch-linux.
 
 1. Installation
 2. First steps inside the soft
@@ -43,9 +42,7 @@ Right now, this has only been tested under windows.
 ### Future devlopments
 
 Important / Fixes :
-- create website and exec files for non technical users.
-- fix the only known bug which is the impossibility to click on the menu
- buttons "file" and "play" while there isn't any file in the library ...
+- create package for easy use on linux.
 - adding a metronom which isn't that straightforward since there are plenty of rythm
 change in complex classical MIDI pieces.
 - automatize the compilation for every platform and MIDI interface.
