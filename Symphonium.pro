@@ -53,7 +53,22 @@ HEADERS += \
 FORMS += \
     symphonium.ui
 
+linux-g++ {
+    isEmpty(PREFIX) {
+        PREFIX = /usr
+    }
+    target.path = $$PREFIX/bin
+
+    desktop.path = $$PREFIX/share/applications/
+    desktop.files += symphonium.desktop
+    icon.path = $$PREFIX/share/icons/hicolor/64x64/apps
+    icon.files += symphonium.png
+
+    INSTALLS += icon
+    INSTALLS += desktop
+    INSTALLS += target
+}
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
