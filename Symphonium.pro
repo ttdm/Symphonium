@@ -21,6 +21,7 @@ DEFINES += __WINDOWS_MM__ #TODO choose your MIDI intput/output library
 #TODO LIBS and INCLUDEPATH must be edited to link your chosen MIDI intput/output library
 win32: LIBS += -L$$PWD/'libs/winMM' -lWinMM-x64
 win32: PRE_TARGETDEPS += $$PWD/'libs/winMM/WinMM-x64.lib'
+unix: LIBS += -lm -lasound -pthread
 
 INCLUDEPATH += libs/
 
