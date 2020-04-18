@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Symphonium
+Comment=A tool to help when learning to play the piano
+Exec=Symphonium
+Icon=symphonium
+Categories=AudioVideo;Audio;Music;
