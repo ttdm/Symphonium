@@ -3,5 +3,5 @@ Type=Application
 Name=Symphonium
 Comment=A tool to help when learning to play the piano
 Exec=application
-Icon=symphonium
+Icon=Symphonium
 Categories=AudioVideo;Audio;Music
