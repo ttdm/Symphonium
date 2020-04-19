@@ -15,6 +15,7 @@
 #include <QDoubleSpinBox>
 #include <QLabel>
 #include <QPushButton>
+#include <QDirIterator>
 
 #include <cmath>
 
@@ -152,7 +153,7 @@ void Symphonium::setupToolbar()
     RTfactorSpin->setPrefix(tr("Speed : "));
     RTfactorSpin->setSuffix(tr("%"));
     RTfactorSpin->setValue(100);
-    RTfactorSpin->setFixedWidth(95);
+    RTfactorSpin->setFixedWidth(QFontMetrics(this->font()).horizontalAdvance("Speed : 100%")+25);
     ui->toolBar->addWidget(RTfactorSpin);
     connect(RTfactorSpin, SIGNAL(valueChanged(int)), this, SLOT(setRTFactor(int)));
 
@@ -162,7 +163,7 @@ void Symphonium::setupToolbar()
     displayDurationSpin->setSuffix(tr("s"));
     displayDurationSpin->setSingleStep(1.0);
     displayDurationSpin->setValue(5.0);
-    displayDurationSpin->setFixedWidth(140);
+    displayDurationSpin->setFixedWidth(QFontMetrics(this->font()).horizontalAdvance("Display Duration : 20.0s")+25);
     ui->toolBar->addWidget(displayDurationSpin);
     connect(displayDurationSpin, SIGNAL(valueChanged(double)), this, SLOT(setDisplayDuration(double)));
 
@@ -176,7 +177,7 @@ void Symphonium::setupToolbar()
     intervalFrom->setText("From ");
     ui->toolBar->addWidget(intervalFrom);//label
     intervalBeginTime = new QTimeEdit;
-    intervalBeginTime->setFixedWidth(50);
+    intervalBeginTime->setFixedWidth(QFontMetrics(this->font()).horizontalAdvance("mm:ss")+15);
     intervalBeginTime->setDisplayFormat(QString("mm:ss"));
     ui->toolBar->addWidget(intervalBeginTime);//timeedit
     connect(intervalBeginTime, SIGNAL(timeChanged(QTime)), this, SLOT(intervalBeginTimeChanged(QTime)));
@@ -184,7 +185,7 @@ void Symphonium::setupToolbar()
     intervalTo->setText(" To ");
     ui->toolBar->addWidget(intervalTo);//label
     intervalEndTime = new QTimeEdit;
-    intervalEndTime->setFixedWidth(50);
+    intervalEndTime->setFixedWidth(QFontMetrics(this->font()).horizontalAdvance("mm:ss")+15);
     intervalEndTime->setDisplayFormat(QString("mm:ss"));
     ui->toolBar->addWidget(intervalEndTime);//timeedit
     connect(intervalEndTime, SIGNAL(timeChanged(QTime)), this, SLOT(intervalEndTimeChanged(QTime)));
@@ -197,7 +198,7 @@ void Symphonium::setupToolbar()
     timeB4restarting->setSuffix(tr("s"));
     timeB4restarting->setSingleStep(0.5);
     timeB4restarting->setValue(manager.options.timeB4Restart);
-    timeB4restarting->setFixedWidth(170);
+    timeB4restarting->setFixedWidth(QFontMetrics(this->font()).horizontalAdvance("Time before restarting : 60.0s")+25);
     ui->toolBar->addWidget(timeB4restarting);
     connect(timeB4restarting, SIGNAL(valueChanged(double)), this, SLOT(changeTimeB4Restart(double)));
 
@@ -210,7 +211,7 @@ void Symphonium::setupToolbar()
     soundLevelSpin->setPrefix(tr("Volume : "));
     soundLevelSpin->setSuffix(tr("%"));
     soundLevelSpin->setValue(100);
-    soundLevelSpin->setFixedWidth(95);
+    soundLevelSpin->setFixedWidth(QFontMetrics(this->font()).horizontalAdvance("Volume : 500%")+25);
     ui->toolBar->addWidget(soundLevelSpin);
     connect(soundLevelSpin, SIGNAL(valueChanged(int)), this, SLOT(setSoundLevel(int)));
     QCheckBox *restreamMIDIIn = new QCheckBox;
@@ -292,16 +293,14 @@ void Symphonium::on_actionAdd_Folder_To_Lib_triggered()
 //
 bool Symphonium::addDirectoryToLib(QDir directory)
 {
-    QStringList fileList = directory.entryList();
     int addedFile = 0;
-    foreach(QString filename, fileList)
+    QDirIterator it(directory.path(), QDir::Files);
+    while (it.hasNext())
     {
-        if (!filename.isEmpty())
-        {
-            bool fileAdded = addFileTolib(directory.filePath(filename));
-            if (fileAdded) addedFile ++;
-        }
+        bool fileAdded = addFileTolib(directory.filePath(it.next()));
+        if (fileAdded) addedFile ++;
     }
+
     if (addedFile == 0)
     {
         QMessageBox Msgbox;
@@ -324,7 +323,7 @@ bool Symphonium::addFileTolib(QString filePath)
 
     //get the name of the file
     QString name = QFileInfo(filePath).fileName();
-    name = name.left(name.length()-4);
+    if (name.lastIndexOf(".") != -1) name = name.left(name.lastIndexOf("."));
 
     // we fill the last empty row
     QTableWidgetItem *newFileName = new QTableWidgetItem(name);
@@ -562,6 +561,7 @@ void Symphonium::on_actionselect_MIDI_device_triggered()
     for ( unsigned int i=0; i<nInPorts+1; i++ ) { //+1 to allow empty input selec if only an output exist (which allow to listen to the songs))
           try {
           std::string portName = manager.midiin->getPortName(i);
+            if (portName.find("RtMidi") != std::string::npos) continue; //don't add RTmidi ports.
             midiinCombo->addItem(QString::fromStdString(portName),Qt::DisplayRole);
         }
               catch ( RtMidiError &error ) {
@@ -574,6 +574,7 @@ void Symphonium::on_actionselect_MIDI_device_triggered()
     for ( unsigned int i=0; i<nOutPorts+1; i++ ) {
           try {
           std::string portName = manager.midiout->getPortName(i);
+          if (portName.find("RtMidi") != std::string::npos) continue; //don't add RTmidi ports.
             midioutCombo->addItem(QString::fromStdString(portName),Qt::DisplayRole);
         }
               catch ( RtMidiError &error ) {
@@ -616,6 +617,18 @@ void Symphonium::finishMIDIdeviceSelection()
     if ( manager.midiout->isPortOpen() ) manager.midiout->closePort();
 
     //open the new ports
+    //get the port number corresponding to the selected options in the combobox :
+    unsigned int nInPorts = manager.midiin->getPortCount();
+    int inPortNumber = -1;
+    for ( unsigned int i=0; i<nInPorts+1; i++ ) {
+        if ( manager.midiin->getPortName(i) == midiinCombo->itemData(midiinCombo->currentIndex()).toString().toStdString() ) inPortNumber = i;
+    }
+    unsigned int nOutPorts = manager.midiout->getPortCount();
+    int outPortNumber = -1;
+    for ( unsigned int i=0; i<nOutPorts+1; i++ ) {
+        if ( manager.midiout->getPortName(i) == midioutCombo->itemData(midioutCombo->currentIndex()).toString().toStdString() ) outPortNumber = i;
+    }
+
     if (!manager.connectRTMIDIobjects2ports(midiinCombo->currentIndex(),midioutCombo->currentIndex()))
     {
         QMessageBox Msgbox;

@@ -2,10 +2,9 @@
 
 A tool to help when learning to play the piano.
 
-**Working on windows only at the moment.**
-Non technical windows user should go the [website](https://symphonium.net/). A windows executable is available. Non technical non windows user should wait a bit while I'm fixing some errors.
+Non technical users should go the [website](https://symphonium.net/). A windows executable is available there. Non technical linux user should use the appImage available in the [release directory](https://github.com/ttdm/Symphonium/releases). Once downloaded, you just need to set it as executable and execute it. Some MIDI files are available in the windows download on the website. 
 
-On linux, it can **only** be used with your MIDI keyboard as sound output and there are some other known bugs (impossible to load a folder in library, only files one by one; in the selection of midi device, selecting the RTMIDI client will lead to a crash..). I'm currently working on cleaning this.
+*Warning: The windows version should be more or less bug-free but it isn't the case for the linux one. Feel free to open issues for any bug you find.*
 
 1. How to compile
 2. First steps inside the soft
@@ -41,8 +40,6 @@ It does compile using the 2 default options, hopefully, it should also compile w
 ### Future devlopments
 
 Important / Fixes :
-- There are multiple bugs on linux, fix them !
-- Once this is done, verify the created appimage. 
 - adding a metronom which isn't that straightforward since there are plenty of rythm
 change in complex classical MIDI pieces.
 
