@@ -1,38 +1,37 @@
 # Synphonium v0.1 [alpha]
 
 A tool to help when learning to play the piano.
-Non technical user should go the [website](https://symphonium.net/). A windows executable is available.
-I'm currently working on creating a package for Arch-linux.
 
-1. Installation
+**Working on windows only at the moment.**
+Non technical windows user should go the [website](https://symphonium.net/). A windows executable is available. Non technical non windows user should wait a bit while I'm fixing some errors.
+
+On linux, it can **only** be used with your MIDI keyboard as sound output and there are some other known bugs (impossible to load a folder in library, only files one by one; in the selection of midi device, selecting the RTMIDI client will lead to a crash..). I'm currently working on cleaning this.
+
+1. How to compile
 2. First steps inside the soft
 3. Future devlopments
 4. Acknowledgments
 
 -----------------------------------------------
 
-### Installation
+### How to compile
 
-First you need QT Creator.
-Then Synphonium.pro needs some editing :
-- line 11, you get to choose the MIDI input/output library you will use across
- Linux (ALSA & JACK), Macintosh OS X (CoreMIDI & JACK), and Windows (Multimedia Library)
- using the following constant : WINDOWS_MM, MACOSX_CORE, LINUX_ALSA, UNIX_JACK
-- then you need to link your chosen MIDI input/output library
+It's a QT Creator project so you will QT creator for your plaform. 
 
-Once those step are completed, hopefully, it should compile.
-Right now, this has only been tested under windows.
+Then Synphonium.pro might needs some editing. :
+- line 20-28, you get to choose the MIDI input/output library you will use and to link it. 
+- By default, it will select ALSA for linux (and link it); and WindowsMM for windows. The mac setup doesnt link to any library since i'm no mac user and i don't know what to link. You can also, if you want, switch to JACK when using linux. 
+- Here is the list of all possibilities and the constants to define : Linux (ALSA & JACK), Macintosh OS X (CoreMIDI & JACK), and Windows (Multimedia Library) using the following constant : WINDOWS_MM, MACOSX_CORE, LINUX_ALSA, UNIX_JACK. 
+
+It does compile using the 2 default options, hopefully, it should also compile when switching for the other 2 and proprely linking the libs. 
 
 -----------------------------------------------
 
 ### First steps inside the soft
 
 1. Add MIDI file to the library by selecting file in the menu (file should be in ".mid")
- /!\ there is a known weird bug which make it impossible to select file in the menu when there
-  is no file in the library ... So you will need to click on view and slide your mouse to file. /!\
 
-2. Select a MIDI device using "Options" in the menu. If you don't have any MIDI device, it won't
- work and you will only be able to "watch the notes fall on the keyboard" in
+2. Select a MIDI device using "Options" in the menu. If you don't have any MIDI device, the soft capabilities will be limited; you will only be able to "watch the notes fall on the keyboard" in
  the "listen to the song" mode.
 
 3. I believe (hopefully) the rest of the soft is self explanatory.
@@ -42,16 +41,17 @@ Right now, this has only been tested under windows.
 ### Future devlopments
 
 Important / Fixes :
-- create package for easy use on linux.
+- There are multiple bugs on linux, fix them !
+- Once this is done, verify the created appimage. 
 - adding a metronom which isn't that straightforward since there are plenty of rythm
 change in complex classical MIDI pieces.
-- automatize the compilation for every platform and MIDI interface.
 
 Minor / For later :
 - resetSettings and resetLibrary options
 - improve the library : MIDI file durations, note number, difficulty estimation (note/sec?)
 - add in game points ?
 - make it usable with any piano by analyzing the input sounds and not the MIDI inputs.
+- mac support would be nice but I can't do it. 
 
 	-----------------------------------------------
 
@@ -67,5 +67,7 @@ The following libraries are used in the soft :
 - RTMIDI
 - MIDIFile
 
-I thank all the people that gave me some advices while I created Symphonium.
 Now that an alpha version is available, I'm totally open to contributions !
+Thanks to the ones that already took some time to improve Symphonium : 
+- zemser
+- probonopd

@@ -16,6 +16,8 @@
 #include <QLabel>
 #include <QPushButton>
 
+#include <cmath>
+
 Symphonium::Symphonium(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::Symphonium)
@@ -529,8 +531,8 @@ void Symphonium::on_actionAbout_triggered()
     Msgbox.setWindowTitle("About Symphonium");
     Msgbox.setTextFormat(Qt::RichText);
     Msgbox.setText("<center> Symphonium is an open source and cross-platform project designed to help learning to play the piano.<br>"
-                   "More information on it can be found on its <a href=\"https://symphonium.net/">website</a>.<br>"
-                   "Its sources can be found on its <a href=\"https://github.com/ttdm/symphonium/\">github repository</a>. Any help to improve the software is welcome !<br>"
+                   "More information on it can be found on its <a href=\"https://symphonium.net\">website</a>.<br>"
+                   "Its sources can be found on its <a href=\'https://github.com/ttdm/symphonium/\'>github repository</a>. Any help to improve the software is welcome !<br>"
                    "Initially developped by <a href=\"https://ttdm.github.io/\">TTDM</a>.</center>");
     Msgbox.exec();
 }
