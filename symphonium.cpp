@@ -621,15 +621,14 @@ void Symphonium::finishMIDIdeviceSelection()
     unsigned int nInPorts = manager.midiin->getPortCount();
     int inPortNumber = -1;
     for ( unsigned int i=0; i<nInPorts+1; i++ ) {
-        if ( manager.midiin->getPortName(i) == midiinCombo->itemData(midiinCombo->currentIndex()).toString().toStdString() ) inPortNumber = i;
+        if ( manager.midiin->getPortName(i) == midiinCombo->currentText().toStdString() ) inPortNumber = i;
     }
     unsigned int nOutPorts = manager.midiout->getPortCount();
     int outPortNumber = -1;
     for ( unsigned int i=0; i<nOutPorts+1; i++ ) {
-        if ( manager.midiout->getPortName(i) == midioutCombo->itemData(midioutCombo->currentIndex()).toString().toStdString() ) outPortNumber = i;
+        if ( manager.midiout->getPortName(i) == midioutCombo->currentText().toStdString() ) outPortNumber = i;
     }
-
-    if (!manager.connectRTMIDIobjects2ports(midiinCombo->currentIndex(),midioutCombo->currentIndex()))
+    if (!manager.connectRTMIDIobjects2ports(inPortNumber,outPortNumber))
     {
         QMessageBox Msgbox;
         Msgbox.setWindowTitle("Error while connecting to the selected devices");
