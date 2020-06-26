@@ -198,7 +198,7 @@ void DisplayArea::paintNotes(QPainter *painter)
                 int noteSize = isBlackKey(currNote) ? blackKeySize : whiteKeySize;
                 QColor thismidiNoteColor = isBlackKey(currNote) ? this->midiNoteColor.darker() : this->midiNoteColor;
                 if (selectedTrack != 0 && i != selectedTrack - 1) thismidiNoteColor = Qt::gray;
-                if (isIntervalOn && (startNoteTime < intInitTime | startNoteTime > intFinalTime)) thismidiNoteColor = Qt::gray;
+                if (isIntervalOn && (startNoteTime < intInitTime || startNoteTime > intFinalTime)) thismidiNoteColor = Qt::gray;
 
                 QPainterPath path;
                 // -.5 below improve the quality of the borders, see https://stackoverflow.com/questions/29196610/qt-drawing-a-filled-rounded-rectangle-with-border#29196812
