@@ -1,6 +1,7 @@
 #include "displayarea.h"
 
 #include <QPainter>
+#include <QPainterPath>
 #include <QPaintEvent>
 #include <QTimer>
 #include <QDebug>
