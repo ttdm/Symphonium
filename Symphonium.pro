@@ -24,8 +24,8 @@ win32: LIBS += -L$$PWD/'libs/winMM' -lWinMM-x64
 win32: PRE_TARGETDEPS += $$PWD/'libs/winMM/WinMM-x64.lib'
 unix:!macx: DEFINES += __LINUX_ALSA__
 unix:!macx: LIBS += -lm -lasound -pthread
-macx: DEFINES += MACOSX_CORE
-#macx: LIBS += ??????
+macx: DEFINES += __MACOSX_CORE__
+macx: LIBS += -framework CoreMIDI -framework CoreAudio -framework CoreFoundation
 
 INCLUDEPATH += libs/
 
