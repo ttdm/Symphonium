@@ -39,7 +39,7 @@ public:
     //Game live and moving variables
     double songTime, prevsongTime, songDuration;
 
-    //Game Live Parameters
+    //Game Live Parameters (reset when closing the app)
     bool isMidiSelectedFileValid;
     bool isMIDIPlaying;
     int gameMode; //0 : list to song, 1 : pratice song ; 2 : play song
@@ -49,6 +49,8 @@ public:
     double userVolumeMultiplier;
     unsigned char lastMIDIVolume[16];
     bool restreamMIDIIn;
+    int transpose;
+
 
     //interval handling :
     bool isIntervalOn; //true if we play only a specific interval

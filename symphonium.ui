@@ -71,7 +71,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -105,6 +105,7 @@
     </property>
     <addaction name="actionselect_MIDI_device"/>
     <addaction name="separator"/>
+    <addaction name="actionColors"/>
     <addaction name="actionPreferences_incoming"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -184,7 +185,7 @@
   </action>
   <action name="actionLibrary_Panel">
    <property name="text">
-    <string>Library Panel</string>
+    <string>Library Panel On/Off</string>
    </property>
   </action>
   <action name="actionFull_Screen">
@@ -219,6 +220,11 @@
   <action name="actionselect_MIDI_device">
    <property name="text">
     <string>select MIDI device</string>
+   </property>
+  </action>
+  <action name="actionColors">
+   <property name="text">
+    <string>Colors</string>
    </property>
   </action>
  </widget>

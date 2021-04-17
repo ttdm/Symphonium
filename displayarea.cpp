@@ -14,9 +14,11 @@ DisplayArea::DisplayArea(QWidget *parent) : QWidget(parent)
     gradient.setColorAt(0.0, Qt::white);
     gradient.setColorAt(1.0, QColor(0xa6, 0xce, 0x39));
 
-    background = QBrush(QColor(40, 40, 40));
+    backgroundColor = QColor(40, 40, 40);
+    background = QBrush(backgroundColor);
     midiNoteColor = QColor(0x31, 0x8C, 0xE7);
     keyboardNoteColor = QColor(0x79, 0x1C, 0xF8);
+    for (int i = 0; i < 9 ; i++ ) trackColors << QColor(0x31, 0x8C, 0xE7) ;
 
     minNote = 21;
     maxNote = 108;
@@ -48,7 +50,7 @@ bool DisplayArea::createInitialDisplay(smf::MidiFile *midiFile)
         {
             if ((*midifile)[i][j].isNoteOn())
             {
-                int currNote = (*midifile)[i][j].getP1();
+                int currNote = (*midifile)[i][j].getP1() + transpose;
                 if (currNote > highestNote) highestNote = currNote;
                 if (currNote < lowestNote ) lowestNote = currNote;
             }
@@ -119,11 +121,12 @@ void DisplayArea::paintPiano(QPainter *painter)
     {
         for (int i = 0; i <midiCurrentNotes.size(); i++)
         {
-            if (!isBlackKey(midiCurrentNotes.at(i)))
+            int currentNote = midiCurrentNotes.at(i);
+            if (!isBlackKey(currentNote))
             {
                 QColor keyColor = midiNoteColor;
                 keyColor.setAlpha(170);
-                painter->fillRect(getNoteX0(midiCurrentNotes.at(i)), h0rl, whiteKeySize, h - h0rl, QBrush(keyColor));
+                painter->fillRect(getNoteX0(currentNote), h0rl, whiteKeySize, h - h0rl, QBrush(keyColor));
             }
         }
     }
@@ -153,11 +156,12 @@ void DisplayArea::paintPiano(QPainter *painter)
     {
         for (int i = 0; i <midiCurrentNotes.size(); i++)
         {
-            if (isBlackKey(midiCurrentNotes.at(i)))
+            int currentNote = midiCurrentNotes.at(i);
+            if (isBlackKey(currentNote))
             {
                 QColor keyColor = midiNoteColor;
                 keyColor.setAlpha(170);
-                painter->fillRect(getNoteX0(midiCurrentNotes.at(i)),h0rl, blackKeySize, (h - h0rl)*0.65, QBrush(keyColor));
+                painter->fillRect(getNoteX0(currentNote),h0rl, blackKeySize, (h - h0rl)*0.65, QBrush(keyColor));
             }
         }
     }
@@ -188,7 +192,7 @@ void DisplayArea::paintNotes(QPainter *painter)
         {
             if ((*midifile)[i][j].isNoteOn())
             {
-                int currNote = (*midifile)[i][j].getP1();
+                int currNote = (*midifile)[i][j].getP1() + transpose;
                 float startNoteTime = (*midifile)[i][j].seconds;
                 float endNoteTime = (*midifile)[i][j].seconds + (*midifile)[i][j].getDurationInSeconds();
 
@@ -196,7 +200,7 @@ void DisplayArea::paintNotes(QPainter *painter)
                 if (endNoteTime < songTime - 0.05 ) continue;
 
                 int noteSize = isBlackKey(currNote) ? blackKeySize : whiteKeySize;
-                QColor thismidiNoteColor = isBlackKey(currNote) ? this->midiNoteColor.darker() : this->midiNoteColor;
+                QColor thismidiNoteColor = isBlackKey(currNote) ? trackColors.at(i).darker() : this->trackColors.at(i);
                 if (selectedTrack != 0 && i != selectedTrack - 1) thismidiNoteColor = Qt::gray;
                 if (isIntervalOn && (startNoteTime < intInitTime || startNoteTime > intFinalTime)) thismidiNoteColor = Qt::gray;
 
@@ -267,7 +271,7 @@ void DisplayArea::paintEvent(QPaintEvent *event)
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
     //qDebug() << "why does a Qdebug here make it work ???? ";
-    painter.fillRect(event->rect(), background); //create the uniform colored background
+    painter.fillRect(event->rect(), backgroundColor); //create the uniform colored background
     this->setOneLoopDisplayParameters(); //(mainly) update key sizes depending on window width
     if (isMidiSelectedFileValid) this->paintNotes(&painter); //add all the notes if there are some
     this->paintPiano(&painter); //add the keyboard above the notes (to have proper boarders, the notes goes "under" the keyboard)
@@ -283,6 +287,13 @@ void DisplayArea::getParamsFromManager(GameManager *manager){
     intInitTime = manager->intInitTime;
     intFinalTime = manager->intFinalTime;
     currPressedNotes = manager->currPressedNotes;
+    transpose = manager->transpose;
+
+    backgroundColor = manager->options.backgroundColor;
+    if (manager->options.MIDINoteColors.size() > 0 ) midiNoteColor = manager->options.MIDINoteColors.at(0); //TODO
+    else midiNoteColor = QColor(0x31, 0x8C, 0xE7); //TODO
+    keyboardNoteColor = manager->options.keyboardNoteColor;
+    if (manager->options.MIDINoteColors.size() > 0 ) trackColors = manager->options.MIDINoteColors;
 
     if (manager->isMidiSelectedFileValid) createInitialDisplay(&manager->midifile);
 }

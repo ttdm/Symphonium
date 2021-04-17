@@ -5,6 +5,7 @@
 
 GameManager::GameManager()
 {
+    transpose = 0;
     isMIDIPlaying = false;
     gameMode = 0;
     handsInplay = 2;
@@ -253,7 +254,37 @@ void GameManager::update()
                             qDebug() << "error while sending 1 MIDI msg";
                         }
                     }
-                    else if (midifile[i][j].getP3()==-1)// 2 arguement midi message
+                    else if (midifile[i][j].isNoteOn())
+                    {
+                        unsigned char currNote = midifile[i][j].getP1();
+                        unsigned char velNote = midifile[i][j].getP2();
+                        std::vector<unsigned char> message(3);
+                        // Note On: 144, note, vel
+                        message[0] = 144;
+                        message[1] = currNote + transpose;
+                        message[2] = velNote;
+                        try {
+                            midiout->sendMessage( &message );
+                        } catch (...) {
+                            qDebug() << "error while sending 1 MIDI msg";
+                        }
+                    }
+                    else if (midifile[i][j].isNoteOff())
+                    {
+                        unsigned char currNote = midifile[i][j].getP1();
+                        unsigned char smthNote = midifile[i][j].getP2();
+                        std::vector<unsigned char> message(3);
+                        // Note Off: 128, note, ??vel??
+                        message[0] = 128;
+                        message[1] = currNote + transpose;
+                        message[2] = smthNote;
+                        try {
+                            midiout->sendMessage( &message );
+                        } catch (...) {
+                            qDebug() << "error while sending 1 MIDI msg";
+                        }
+                    }
+                    else if (midifile[i][j].getP3()==-1)// other types of 2 arguement midi message
                     {
                         std::vector<unsigned char> message(3);
                         message[0] = midifile[i][j].getP0();
@@ -307,7 +338,7 @@ void GameManager::update()
                      {
                          if (midifile[i][j].isNoteOn())
                          {
-                             unsigned char currNote = midifile[i][j].getP1();
+                             unsigned char currNote = midifile[i][j].getP1() + transpose;
                              if (currPressedNotes.find(currNote) == currPressedNotes.end()) increaseTime = false;
                          }
                      }
@@ -362,7 +393,7 @@ void GameManager::update()
                             std::vector<unsigned char> message(3);
                             // Note On: 144, note, vel
                             message[0] = 144;
-                            message[1] = currNote;
+                            message[1] = currNote + transpose;
                             message[2] = velNote;
                             try {
                                 midiout->sendMessage( &message );
@@ -377,7 +408,7 @@ void GameManager::update()
                             std::vector<unsigned char> message(3);
                             // Note Off: 128, note, ??vel??
                             message[0] = 128;
-                            message[1] = currNote;
+                            message[1] = currNote + transpose;
                             message[2] = smthNote;
                             try {
                                 midiout->sendMessage( &message );

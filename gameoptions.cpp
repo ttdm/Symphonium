@@ -1,5 +1,4 @@
 #include "gameoptions.h"
-#include <QString>
 #include <QCoreApplication>
 
 GameOptions::GameOptions()
@@ -13,6 +12,10 @@ GameOptions::GameOptions()
     MIDIoutPortName = "";
     timeB4Restart = 5.0;
     settingsFileName = "settings.ini";
+
+    keyboardNoteColor = QColor(0x79, 0x1C, 0xF8);
+    backgroundColor = QColor(40, 40, 40);
+    for (int i = 0; i < 9 ; i++ ) MIDINoteColors << QColor(0x31, 0x8C, 0xE7) ;
 }
 
 bool GameOptions::saveConfig()
@@ -46,6 +49,21 @@ bool GameOptions::saveConfig()
 
     //save time B4 restart
     settings.setValue("timeB4Restart", timeB4Restart);
+
+
+    //save colors ;
+    settings.setValue("backgroundColor", backgroundColor.rgba());
+    settings.setValue("keyboardNoteColor", keyboardNoteColor.rgba());
+
+    settings.beginWriteArray("MIDINoteColors");
+    for (int i = 0; i < MIDINoteColors.size(); ++i) {
+        settings.setArrayIndex(i);
+        settings.setValue("MIDINoteColor", MIDINoteColors.at(i).rgba());
+    }
+    settings.endArray();
+
+
+
     return true;
 }
 
@@ -77,6 +95,16 @@ bool GameOptions::loadConfig()
     if (settings.contains("MIDIinPortName")) MIDIinPortName = settings.value("MIDIinPortName").toString();
     if (settings.contains("MIDIoutPortName")) MIDIoutPortName = settings.value("MIDIoutPortName").toString();
     if (settings.contains("timeB4Restart")) timeB4Restart = settings.value("timeB4Restart").toDouble();
+
+    if (settings.contains("backgroundColor")) backgroundColor = settings.value("backgroundColor").toUInt();
+    if (settings.contains("keyboardNoteColor")) keyboardNoteColor = settings.value("keyboardNoteColor").toUInt();
+
+    size = settings.beginReadArray("MIDINoteColors");
+    for (int i = 0; i < size; ++i) {
+        settings.setArrayIndex(i);
+        MIDINoteColors[i] = settings.value("MIDINoteColor").toUInt();
+    }
+    settings.endArray();
 
     return true;
 }

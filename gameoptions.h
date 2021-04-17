@@ -7,6 +7,7 @@
 #include <QVector>
 #include <QDir>
 #include <QString>
+#include <QColor>
 
 class GameOptions
 {
@@ -26,10 +27,16 @@ public:
     //midi port names
     QString MIDIinPortName, MIDIoutPortName;
 
-    //game parameters
+    //game parameters saved over time
     double timeB4Restart;//time before song restart
     double positiveTimeErrorAllowed; //delta delay allowed between midiin and midifile before considering a note missed;
     double negativeTimeErrorAllowed; //delta delay allowed between midiin and midifile before considering a note missed;
+
+    //colors
+    QColor keyboardNoteColor, backgroundColor;
+    QVector<QColor> MIDINoteColors;
+
+
 };
 
 #endif // GAMEOPTIONS_H

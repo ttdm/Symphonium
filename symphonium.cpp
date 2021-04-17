@@ -206,7 +206,6 @@ void Symphonium::setupToolbar()
     ui->toolBar->addSeparator();
     QSpinBox *soundLevelSpin = new QSpinBox;
     soundLevelSpin->setRange(0,500);
-    soundLevelSpin->setRange(0,500);
     soundLevelSpin->setSingleStep(10);
     soundLevelSpin->setPrefix(tr("Volume : "));
     soundLevelSpin->setSuffix(tr("%"));
@@ -218,6 +217,24 @@ void Symphonium::setupToolbar()
     restreamMIDIIn->setText("Forward MIDI Input to output");
     connect(restreamMIDIIn, SIGNAL(stateChanged(int)), this, SLOT(restreamMIDIin(int)));
     ui->toolBar->addWidget(restreamMIDIIn);
+
+    //transposition
+    QSpinBox *transposeSpin = new QSpinBox;
+    transposeSpin->setRange(-50,50);
+    transposeSpin->setPrefix(tr("Transpose : "));
+    transposeSpin->setSuffix(tr("halftones"));
+    transposeSpin->setSingleStep(1);
+    transposeSpin->setValue(0);
+    transposeSpin->setFixedWidth(QFontMetrics(this->font()).horizontalAdvance("Transpose : 50 halftones"));
+    ui->toolBar->addWidget(transposeSpin);
+    connect(transposeSpin, SIGNAL(valueChanged(int)), this, SLOT(setTranspose(int)));
+
+
+}
+
+void Symphonium::setTranspose(int transpose)
+{
+    manager.transpose = transpose;
 }
 
 void Symphonium::setDisplayDuration(double duration)
@@ -606,6 +623,92 @@ void Symphonium::on_actionselect_MIDI_device_triggered()
 
     midiDialog->show();
 }
+
+
+void Symphonium::on_actionColors_triggered()
+{
+    midiDialog = new QDialog();
+    midiDialog->setWindowTitle("Define the game colors");
+
+    colorCombo = new QComboBox();
+    colorCombo->addItem("Background color",Qt::DisplayRole);
+    colorCombo->addItem("Keyboard notes color",Qt::DisplayRole);
+    colorCombo->addItem("Track 0 notes color",Qt::DisplayRole);
+    colorCombo->addItem("Track 1 notes color",Qt::DisplayRole);
+    colorCombo->addItem("Track 2 notes color",Qt::DisplayRole);
+    colorCombo->addItem("Track 3 notes color",Qt::DisplayRole);
+    colorCombo->addItem("Track 4 notes color",Qt::DisplayRole);
+    colorCombo->addItem("Track 5 notes color",Qt::DisplayRole);
+    colorCombo->addItem("Track 6 notes color",Qt::DisplayRole);
+    colorCombo->addItem("Track 7 notes color",Qt::DisplayRole);
+    colorCombo->addItem("Track 8 or more notes color",Qt::DisplayRole);
+    connect(colorCombo, SIGNAL(activated(int)), this, SLOT(selectColorTochange(int)));
+
+    colorDialog = new QColorDialog();
+    colorDialog->setOption(QColorDialog::ShowAlphaChannel,true);
+    colorDialog->setOption(QColorDialog::NoButtons,true);
+    colorDialog->setOption(QColorDialog::DontUseNativeDialog,true);
+    connect(colorDialog, SIGNAL(currentColorChanged(QColor)), this, SLOT(colorChanged(QColor)));
+
+    QPushButton *apply = new QPushButton;
+    apply->setText("Apply");
+    connect(apply, SIGNAL(clicked()), this, SLOT(cancelMIDIdeviceSelection()));
+
+    QPushButton *cancel = new QPushButton;
+    cancel->setText("Cancel");
+    connect(cancel, SIGNAL(clicked()), this, SLOT(cancelMIDIdeviceSelection()));
+
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addWidget(apply);
+ //   buttonLayout->addWidget(cancel);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(colorCombo);
+    layout->addWidget(colorDialog);
+    layout->addLayout(buttonLayout);
+    midiDialog->setLayout(layout);
+
+    midiDialog->show();
+}
+
+void Symphonium::selectColorTochange(int answerId)
+{
+    if (answerId == 0)
+    {
+        colorDialog->setCurrentColor(manager.options.backgroundColor);
+    }
+    else if (answerId == 1)
+    {
+        colorDialog->setCurrentColor(manager.options.keyboardNoteColor);
+                }
+    else if (answerId > 1)
+    {
+        colorDialog->setCurrentColor(manager.options.MIDINoteColors.at(answerId-2));
+    }
+}
+
+void Symphonium::colorChanged(QColor newColor)
+{
+    int colorComboBoxSelectedId = colorCombo->currentIndex();
+
+    if (colorComboBoxSelectedId == 0)
+    {
+        manager.options.backgroundColor = newColor;
+    }
+    else if ( colorComboBoxSelectedId == 1)
+    {
+        manager.options.keyboardNoteColor = newColor;
+    }
+    else if (colorComboBoxSelectedId > 1)
+    {
+        manager.options.MIDINoteColors[colorComboBoxSelectedId-2] = newColor;
+    }
+    manager.options.isConfigModified = true;
+}
+
+
+
+
 
 void Symphonium::finishMIDIdeviceSelection()
 {

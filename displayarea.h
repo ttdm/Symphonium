@@ -24,6 +24,9 @@ public:
     bool createInitialDisplay(smf::MidiFile *midifile);
     void getParamsFromManager(GameManager *manager);
     double songTimeShowed;
+    QColor keyboardNoteColor;
+    QColor midiNoteColor, backgroundColor;
+    QVector<QColor> trackColors;
 
 public slots:
     void animate();
@@ -53,9 +56,7 @@ private:
     smf::MidiFile *midifile;
     int whiteKeySize, blackKeySize;
     QVector<int> midiCurrentNotes;
-    QColor midiNoteColor;
     std::set<int> currPressedNotes;
-    QColor keyboardNoteColor;
 
     double songTime;
     int selectedTrack;
@@ -64,7 +65,7 @@ private:
     bool isIntervalOn;
     double intInitTime, intFinalTime;
 
-
+    int transpose;
 
 };
 

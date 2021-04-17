@@ -9,6 +9,8 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QTimeEdit>
+#include <QColorDialog>
+
 
 #include "displayarea.h"
 #include "gamemanager.h"
@@ -46,9 +48,12 @@ private slots:
     void on_actionAbout_triggered();
     void on_actionOnline_FAQ_triggered();
     void selectMode(int);
+    void selectColorTochange(int answerId);
     void selectTrackMode(int);
+    void colorChanged(QColor newColor);
     void setRTFactor(int);
     void setDisplayDuration(double);
+    void setTranspose(int);
     void setSoundLevel(int);
     void restreamMIDIin(int);
 
@@ -57,6 +62,7 @@ private slots:
 
     void on_slider_valueChanged(int value);
 
+    void on_actionColors_triggered();
     void on_actionselect_MIDI_device_triggered();
     void finishMIDIdeviceSelection();
     void cancelMIDIdeviceSelection();
@@ -73,9 +79,10 @@ private:
     QAction *trackSelectionWidgetAddAction; // widget updated during execution; needs qaction ref to delete old irrelevant one
     QAction *trackSelectionFollowingWidgetAction; // needed to place corectly the previous widget
     QLabel *songDurationLabel;
-    QComboBox *modeCombo;
+    QComboBox *modeCombo, *colorCombo;
     QDialog *midiDialog;
     QComboBox *midiinCombo, *midioutCombo;
+    QColorDialog *colorDialog;
 
     QTimeEdit *intervalBeginTime, *intervalEndTime;
 
