@@ -36,7 +36,7 @@ void GameManager::connectRTMIDIatStart()
 {
     unsigned int nInPorts = midiin->getPortCount();
     int inId = -1;
-    for (  int i=0; i<nInPorts; i++ ) {
+    for (  uint i=0;  i <nInPorts; i++ ) {
           try {
               std::string portName = midiin->getPortName(i);
               if (!QString::compare(options.MIDIinPortName, QString::fromStdString(portName), Qt::CaseInsensitive ))

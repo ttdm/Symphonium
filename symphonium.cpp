@@ -2,7 +2,6 @@
 #include "ui_symphonium.h"
 #include "MIDIFile/include/MidiFile.h"
 
-#include <QDesktopWidget>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QTableWidget>
@@ -153,7 +152,7 @@ void Symphonium::setupToolbar()
     RTfactorSpin->setPrefix(tr("Speed : "));
     RTfactorSpin->setSuffix(tr("%"));
     RTfactorSpin->setValue(100);
-    RTfactorSpin->setFixedWidth(QFontMetrics(this->font()).width("Speed : 100%")+25);
+    RTfactorSpin->setFixedWidth(QFontMetrics(this->font()).horizontalAdvance("Speed : 100%")+25);
     ui->toolBar->addWidget(RTfactorSpin);
     connect(RTfactorSpin, SIGNAL(valueChanged(int)), this, SLOT(setRTFactor(int)));
 
@@ -163,7 +162,7 @@ void Symphonium::setupToolbar()
     displayDurationSpin->setSuffix(tr("s"));
     displayDurationSpin->setSingleStep(1.0);
     displayDurationSpin->setValue(5.0);
-    displayDurationSpin->setFixedWidth(QFontMetrics(this->font()).width("Display Duration : 20.0s")+25);
+    displayDurationSpin->setFixedWidth(QFontMetrics(this->font()).horizontalAdvance("Display Duration : 20.0s")+25);
     ui->toolBar->addWidget(displayDurationSpin);
     connect(displayDurationSpin, SIGNAL(valueChanged(double)), this, SLOT(setDisplayDuration(double)));
 
@@ -177,7 +176,7 @@ void Symphonium::setupToolbar()
     intervalFrom->setText("From ");
     ui->toolBar->addWidget(intervalFrom);//label
     intervalBeginTime = new QTimeEdit;
-    intervalBeginTime->setFixedWidth(QFontMetrics(this->font()).width("mm:ss")+15);
+    intervalBeginTime->setFixedWidth(QFontMetrics(this->font()).horizontalAdvance("mm:ss")+15);
     intervalBeginTime->setDisplayFormat(QString("mm:ss"));
     ui->toolBar->addWidget(intervalBeginTime);//timeedit
     connect(intervalBeginTime, SIGNAL(timeChanged(QTime)), this, SLOT(intervalBeginTimeChanged(QTime)));
@@ -185,7 +184,7 @@ void Symphonium::setupToolbar()
     intervalTo->setText(" To ");
     ui->toolBar->addWidget(intervalTo);//label
     intervalEndTime = new QTimeEdit;
-    intervalEndTime->setFixedWidth(QFontMetrics(this->font()).width("mm:ss")+15);
+    intervalEndTime->setFixedWidth(QFontMetrics(this->font()).horizontalAdvance("mm:ss")+15);
     intervalEndTime->setDisplayFormat(QString("mm:ss"));
     ui->toolBar->addWidget(intervalEndTime);//timeedit
     connect(intervalEndTime, SIGNAL(timeChanged(QTime)), this, SLOT(intervalEndTimeChanged(QTime)));
@@ -198,7 +197,7 @@ void Symphonium::setupToolbar()
     timeB4restarting->setSuffix(tr("s"));
     timeB4restarting->setSingleStep(0.5);
     timeB4restarting->setValue(manager.options.timeB4Restart);
-    timeB4restarting->setFixedWidth(QFontMetrics(this->font()).width("Time before restarting : 60.0s")+25);
+    timeB4restarting->setFixedWidth(QFontMetrics(this->font()).horizontalAdvance("Time before restarting : 60.0s")+25);
     ui->toolBar->addWidget(timeB4restarting);
     connect(timeB4restarting, SIGNAL(valueChanged(double)), this, SLOT(changeTimeB4Restart(double)));
 
@@ -210,7 +209,7 @@ void Symphonium::setupToolbar()
     soundLevelSpin->setPrefix(tr("Volume : "));
     soundLevelSpin->setSuffix(tr("%"));
     soundLevelSpin->setValue(100);
-    soundLevelSpin->setFixedWidth(QFontMetrics(this->font()).width("Volume : 500%")+25);
+    soundLevelSpin->setFixedWidth(QFontMetrics(this->font()).horizontalAdvance("Volume : 500%")+25);
     ui->toolBar->addWidget(soundLevelSpin);
     connect(soundLevelSpin, SIGNAL(valueChanged(int)), this, SLOT(setSoundLevel(int)));
     QCheckBox *restreamMIDIIn = new QCheckBox;
@@ -225,7 +224,7 @@ void Symphonium::setupToolbar()
     transposeSpin->setSuffix(tr("halftones"));
     transposeSpin->setSingleStep(1);
     transposeSpin->setValue(0);
-    transposeSpin->setFixedWidth(QFontMetrics(this->font()).horizontalAdvance("Transpose : 50 halftones"));
+    transposeSpin->setFixedWidth(QFontMetrics(this->font()).horizontalAdvance("Transpose : 50 halftones")+25);
     ui->toolBar->addWidget(transposeSpin);
     connect(transposeSpin, SIGNAL(valueChanged(int)), this, SLOT(setTranspose(int)));
 
