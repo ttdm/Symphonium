@@ -498,7 +498,10 @@ void Symphonium::on_actionStop_triggered()
         manager.songTime = -manager.options.timeB4Restart/2.0;
     }
     manager.isMIDIPlaying = false;
-}
+
+    // Send a all notes off midi signal.
+    manager.sendStopMessage();
+ }
 
 void Symphonium::on_actionSkip_Fwd_triggered()
 {

@@ -26,6 +26,7 @@ public:
     bool connectRTMIDIobjects2ports(uint inId, uint outId);
     void setVolume();
     void readMIDIin();
+    void sendStopMessage();
 
     smf::MidiFile midifile;// the midifile that's currently being displayed (and proably played!)
     //RT MIDI

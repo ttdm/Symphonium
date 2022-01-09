@@ -493,3 +493,16 @@ void GameManager::readMIDIin(){
         midiin->getMessage(&oneInput);
     }
 }
+
+void GameManager::sendStopMessage()
+{
+    std::vector<unsigned char> message(3);
+    message[0] = 176;
+    message[1] = 123;
+    message[2] = 0;
+    try {
+        midiout->sendMessage( &message );
+    } catch (...) {
+        qDebug() << "error while sending all notes off command" ;
+    }
+}
