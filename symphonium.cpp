@@ -66,8 +66,11 @@ Symphonium::Symphonium(QWidget *parent)
     if (!manager.isMIDIDeviceReady)
     {
         ui->statusbar->setStyleSheet("color: red");
-        ui->statusbar->showMessage("The MIDI device in memory has not been found ! Not sending and receiving MIDI messages at the moment !");
+        ui->statusbar->showMessage("The MIDI device in memory has not been found ! Reverting to default MIDI channels !");
+        manager.connectRTMIDIToDefault();
     }
+
+
 
     //create a timer fonction to make the app work periodically.
     QTimer *timer = new QTimer(this);
@@ -733,17 +736,7 @@ void Symphonium::finishMIDIdeviceSelection()
     for ( unsigned int i=0; i<nOutPorts+1; i++ ) {
         if ( manager.midiout->getPortName(i) == midioutCombo->currentText().toStdString() ) outPortNumber = i;
     }
-    if (!manager.connectRTMIDIobjects2ports(inPortNumber,outPortNumber))
-    {
-        QMessageBox Msgbox;
-        Msgbox.setWindowTitle("Error while connecting to the selected devices");
-        Msgbox.setTextFormat(Qt::RichText);
-          Msgbox.setText("<center>Error while connecting to the selected devices. Please try to connect other MIDI devices.<br>"
-                         "Please note that connecting ONLY to an output device will trigger this message but still allow to watch the MIDIFile and to listen to them.<br><br>"
-                         "Feel free to ask for help by opening a <a href=\"https://github.com/ttdm/symphonium/issue\">github issue</a>.</center>");
-            Msgbox.exec();
-        return;
-    }
+    manager.connectRTMIDIobjects2ports(inPortNumber,outPortNumber);
     manager.isMIDIDeviceReady = true;
 }
 

@@ -74,24 +74,58 @@ void GameManager::connectRTMIDIatStart()
     isMIDIDeviceReady = true;
 }
 
+void GameManager::connectRTMIDIToDefault(){
+    // if we have at least an output MIDI port, connect to it.
+    // else display a message box
+    if (unsigned int nOutPorts = midiout->getPortCount() == 0) {
+        QMessageBox Msgbox;
+        Msgbox.setWindowTitle("No MIDI port detected");
+        Msgbox.setTextFormat(Qt::RichText);
+        Msgbox.setText("<center>We were unable to find a MIDI device. Please connect your MIDI devices or try to reconnect it.<br>"
+                         "Feel free to ask for help by opening a <a href=\"https://github.com/ttdm/symphonium/issue\">github issue</a>.</center>");
+        Msgbox.exec();
+        return;
+    }
+        connectRTMIDIobjects2ports(0,0);
+}
+
 bool GameManager::connectRTMIDIobjects2ports(uint inId, uint outId)
 {
-    bool openFail = false;
+    bool inFail = false;
+    bool outFail = false;
     try {
         midiin->openPort(inId);
     }
     catch ( RtMidiError &error ) {
       error.printMessage();
-      openFail = true;
+      inFail = true;
     }
     try {
         midiout->openPort(outId);
     }
     catch ( RtMidiError &error ) {
       error.printMessage();
-      openFail = true;
+      outFail = true;
     }
-    if (openFail) return false; //don't update the config and display error msg
+
+    if (outFail){
+        QMessageBox Msgbox;
+        Msgbox.setWindowTitle("Error while connecting to the selected MIDI devices");
+        Msgbox.setTextFormat(Qt::RichText);
+        Msgbox.setText("<center>Error while connecting to the selected devices. Please try to connect to another MIDI device.<br>"
+                         "Feel free to ask for help by opening a <a href=\"https://github.com/ttdm/symphonium/issue\">github issue</a>.</center>");
+        Msgbox.exec();
+    }
+    else if (inFail) {
+        QMessageBox Msgbox;
+        Msgbox.setWindowTitle("Connexion to an output MIDI device only");
+        Msgbox.setTextFormat(Qt::RichText);
+        Msgbox.setText("<center>You are connected to an output MIDI device only.<br>"
+                         "This means that you can watch the MIDIFiles and to listen to them but you wont be able to play them.<br><br>"
+                         "Feel free to ask for help by opening a <a href=\"https://github.com/ttdm/symphonium/issue\">github issue</a>.</center>");
+        Msgbox.exec();
+    }
+    if (inFail||outFail) return false; //don't update the config and display error msg
 
     // update config if needed
     if ( QString::compare(options.MIDIinPortName, QString::fromStdString(midiin->getPortName(inId)), Qt::CaseInsensitive) )

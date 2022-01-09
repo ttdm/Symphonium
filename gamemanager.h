@@ -22,6 +22,7 @@ public:
 
     void update();
     void connectRTMIDIatStart();
+    void connectRTMIDIToDefault();
     bool createRTMIDIobjects();
     bool connectRTMIDIobjects2ports(uint inId, uint outId);
     void setVolume();
