@@ -1,10 +1,13 @@
-# Synphonium v0.1 [alpha]
+# Synphonium v1.0
 
 A tool to help when learning to play the piano.
 
-Non technical users should go the [website](https://symphonium.net/). A windows executable is available there. Non technical linux user should use the appImage available in the [release directory](https://github.com/ttdm/Symphonium/releases). Once downloaded, you just need to set it as executable and execute it. Some MIDI files are available in the windows download on the website. 
+To download the latest versions on all platforms, see [this post](https://github.com/ttdm/Symphonium/issues/11).
+You can also find around 40 MIDI files to download on the website. 
 
-*Warning: The windows version should be more or less bug-free but it isn't the case for the linux one. Feel free to open issues for any bug you find.*
+The following ReadMe is focused on technical users that would want to build the project from its sources.
+Non technical users will probably get more informations from reading [website](https://symphonium.net/).
+
 
 1. How to compile
 2. First steps inside the soft
@@ -15,14 +18,18 @@ Non technical users should go the [website](https://symphonium.net/). A windows 
 
 ### How to compile
 
-It's a QT Creator project so you will QT creator for your plaform. 
+It's pretty simple : It's a QT Creator project so you will QT Creator for your plaform.
+And that's all. All the others libraries are shipped (as sources or .Lib) with the project. 
 
-Then Synphonium.pro might needs some editing. :
+So you only need to open the project file (.pro) with QT Creator and then you can build and run with Ctrl+R
+
+
+Compilation options, directly by editing the Symphonium.pro file : 
 - line 20-28, you get to choose the MIDI input/output library you will use and to link it. 
-- By default, it will select ALSA for linux (and link it); and WindowsMM for windows. The mac setup doesnt link to any library since i'm no mac user and i don't know what to link. You can also, if you want, switch to JACK when using linux. 
+- By default, it will select ALSA for linux (and link it); and WindowsMM for windows. You can also, if you want, switch to JACK when using linux. 
 - Here is the list of all possibilities and the constants to define : Linux (ALSA & JACK), Macintosh OS X (CoreMIDI & JACK), and Windows (Multimedia Library) using the following constant : WINDOWS_MM, MACOSX_CORE, LINUX_ALSA, UNIX_JACK. 
 
-It does compile using the 2 default options, hopefully, it should also compile when switching for the other 2 and proprely linking the libs. 
+It does compile using the 3 default options, I never tested it with JACK.  
 
 -----------------------------------------------
 
@@ -48,7 +55,6 @@ Minor / For later :
 - improve the library : MIDI file durations, note number, difficulty estimation (note/sec?)
 - add in game points ?
 - make it usable with any piano by analyzing the input sounds and not the MIDI inputs.
-- mac support would be nice but I can't do it. 
 
 	-----------------------------------------------
 
