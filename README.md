@@ -3,10 +3,10 @@
 A tool to help when learning to play the piano.
 
 To download the latest versions on all platforms, see [this post](https://github.com/ttdm/Symphonium/issues/11).
-You can also find around 40 MIDI files to download on the website. 
+You can also find around 40 MIDI files to download on the [website](https://symphonium.net/). 
 
 The following ReadMe is focused on technical users that would want to build the project from its sources.
-Non technical users will probably get more informations from reading [website](https://symphonium.net/).
+Non technical users will probably get more informations from reading the [website](https://symphonium.net/).
 
 
 1. How to compile
@@ -22,7 +22,6 @@ It's pretty simple : It's a QT Creator project so you will QT Creator for your p
 And that's all. All the others libraries are shipped (as sources or .Lib) with the project. 
 
 So you only need to open the project file (.pro) with QT Creator and then you can build and run with Ctrl+R
-
 
 Compilation options, directly by editing the Symphonium.pro file : 
 - line 20-28, you get to choose the MIDI input/output library you will use and to link it. 
