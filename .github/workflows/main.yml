@@ -82,7 +82,7 @@ jobs:
         cd ${{github.workspace}}\build\release\
         ls
     -
-      name: Compress portable program
+      name: Compress portable program and release
       run: |
         mkdir ${{github.workspace}}\build\all\
         ls
@@ -93,8 +93,6 @@ jobs:
         Compress-Archive -Path ${{github.workspace}}\build\all\ -DestinationPath ${{github.workspace}}\build\final.zip
         cd ${{github.workspace}}\build\
         ls
-    -
-      name: Release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
