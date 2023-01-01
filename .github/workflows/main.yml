@@ -97,11 +97,6 @@ jobs:
         cd ${{github.workspace}}\build\
         ls
       
-    -
-      name: Reading files
-      run: |
-        cd ${{github.workspace}}\build\   
-        ls
     
     -
       name: Release
