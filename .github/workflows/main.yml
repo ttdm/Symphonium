@@ -1,5 +1,8 @@
 name: Compile and Release Qt6 Project Windows
-on: push
+on: 
+  push:
+    tags:
+      - "*"
 
 env:
   QT_VERSION:     "6.2.0"
@@ -103,8 +106,8 @@ jobs:
     -
       name: Release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: build\*.zip
-      env:
+        body_path: ${{ github.workspace }}\build\final.zip
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      env:
+        GITHUB_REPOSITORY: Symphonium/Symphonium
