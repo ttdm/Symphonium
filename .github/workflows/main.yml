@@ -91,11 +91,13 @@ jobs:
         windeployqt.exe Symphonium.exe --release
         ls
         Compress-Archive -Path ${{github.workspace}}\build\all\ -DestinationPath ${{github.workspace}}\build\final.zip
+        cd ${{github.workspace}}\build\
+        ls
     -
       name: Release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: ${{github.workspace}}/build/final.zip
+        files: ${{github.workspace}}\build\final.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
