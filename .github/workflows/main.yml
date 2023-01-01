@@ -37,6 +37,8 @@ jobs:
         arch: ${{ env.MINGW_VERSION }}
         dir: "${{github.workspace}}/qt"
         install-deps: "true"
+        cache: 'true'
+        cache-key-prefix: 'install-qt-action'
     -
       name: Set Qt path and refresh
       run: |
@@ -66,7 +68,7 @@ jobs:
         mingw32-make.exe -version  
     
     -
-      name: Configure CMake Project from Qmake
+      name: Create Makefile from Qmake
       working-directory: ${{github.workspace}}
       env:
         CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
@@ -80,9 +82,9 @@ jobs:
       name: Compress portable program
       run: |
         mkdir ${{github.workspace}}\build\all\
-        cp ${{github.workspace}}/build/RePr.exe ${{github.workspace}}\build\all\
+        cp ${{github.workspace}}/build/Symphonium.exe ${{github.workspace}}\build\all\
         cd ${{github.workspace}}\build\all\
-        windeployqt.exe RePr.exe --release
+        windeployqt.exe Symphonium.exe --release
         ls
         Compress-Archive -Path ${{github.workspace}}\build\all\ -DestinationPath ${{github.workspace}}\build\final.zip
     -
