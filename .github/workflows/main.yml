@@ -102,7 +102,7 @@ jobs:
       name: Release
       uses: softprops/action-gh-release@v1
       with:
-        body_path: ${{ github.workspace }}\build\final.zip
+        files: ${{ github.workspace }}\build\final.zip
         token: ${{ secrets.GITHUB_TOKEN }}
       env:
         GITHUB_REPOSITORY: Symphonium/Symphonium
