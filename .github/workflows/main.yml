@@ -93,11 +93,13 @@ jobs:
         Compress-Archive -Path ${{github.workspace}}\build\all\ -DestinationPath ${{github.workspace}}\build\final.zip
         cd ${{github.workspace}}\build\
         ls
+      
     -
       name: Reading files
       run: |
-	    cd ${{github.workspace}}\build\   
+        cd ${{github.workspace}}\build\   
         ls
+    
     -
       name: Release
       uses: softprops/action-gh-release@v1
