@@ -55,23 +55,24 @@ jobs:
 #    -
 #      name: Prepend path
 #      run: echo ":${{github.workspace}}/qt/Qt/${{ env.QT_VERSION }}/mingw73_32/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-#    -
-#      name: Check QMake, CMake and make
-#      run: |
-#        Write-Output (Get-Command qmake.exe).Path
-#        qmake.exe -version
-#        Write-Output (Get-Command cmake.exe).Path
-#        cmake.exe -version
-#        Write-Output (Get-Command mingw32-make.exe).Path
-#        mingw32-make.exe -version  
     -
-      name: Configure CMake Proyect
+      name: Check QMake, CMake and make
+      run: |
+        Write-Output (Get-Command qmake.exe).Path
+        qmake.exe -version
+        Write-Output (Get-Command cmake.exe).Path
+        cmake.exe -version
+        Write-Output (Get-Command mingw32-make.exe).Path
+        mingw32-make.exe -version  
+    
+    -
+      name: Configure CMake Project from Qmake
       working-directory: ${{github.workspace}}
       env:
         CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
-      run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -G "CodeBlocks - MinGW Makefiles" -B ${{github.workspace}}/build
+      run: qmake -makefile -o ${{github.workspace}}/build/Makefile Symphonium.pro
     -
-      name: Build proyect
+      name: Build project 
       working-directory: ${{github.workspace}}/build
       run: |
         mingw32-make.exe
