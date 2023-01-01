@@ -78,11 +78,15 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: |
         mingw32-make.exe
+        ls
+        cd ${{github.workspace}}\build\release\
+        ls
     -
       name: Compress portable program
       run: |
         mkdir ${{github.workspace}}\build\all\
-        cp ${{github.workspace}}/build/Symphonium.exe ${{github.workspace}}\build\all\
+        ls
+        cp ${{github.workspace}}\build\release\Symphonium.exe ${{github.workspace}}\build\all\
         cd ${{github.workspace}}\build\all\
         windeployqt.exe Symphonium.exe --release
         ls
